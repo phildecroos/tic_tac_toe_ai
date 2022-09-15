@@ -1,0 +1,3 @@
+Increase weightings of the +/- elo for each move based on how recent it was. Last move done adds or subtracts more than the first move done.
+
+Fix data storage to be a sorted list of all possible games in a csv with a column for each square's score.
