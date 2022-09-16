@@ -1,3 +1,15 @@
+'''
+In this implementation of a machine learning bot, I did not know how to make a 
+neural network.
+This was designed to learn by recording every situation the bot had been in 
+before and whether or not it won the game after making the move it chose.
+This approach is very slow, as every time the bot wants to refer back to it's 
+previous experience it has to parse a list of every situation it has ever
+encountered.
+In theory it would work, but I encountered numerous bugs that I couldn't figure
+out how to fix, so I decided to learn how to make a neural network instead.
+'''
+
 import os
 import random
 import csv
