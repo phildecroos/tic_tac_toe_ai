@@ -1,6 +1,8 @@
 import os
+import math
 import random
 from os.path import exists
+from tabnanny import check
 
 clear = lambda: os.system('cls')
 clear()
@@ -62,6 +64,9 @@ def find_move(board):
             outputs[i] += board[i] * weights[j][i] + biases[j][i]
 
     avail = free_moves(board)
+    
+    for i in range(9):
+        outputs[i] = abs(outputs[i])
 
     for i in range(9):
         max_index = outputs.index(max(outputs))
@@ -70,6 +75,29 @@ def find_move(board):
             return max_index
         else:
             outputs[max_index] = -1.0
+
+    print("no move chosen by ai")
+    return 9
+
+# def function that randomly changes a value in the neural network for training
+# the % it will change randomly selected values by during each test
+test_rate = 0.1
+# globals for ease of reusing
+test_type = 1
+test_row = 1
+test_col = 1
+test_change = 1
+def rand_change():
+    posneg = random.randint(0,1) * 2 - 1 # will randomly be 1 or -1
+    test_type = random.randint(0,1)
+    test_row = random.randint(0,8)
+    test_col = random.randint(0,8)
+    test_change = test_rate * posneg * weights[test_row][test_col]
+
+    if test_type:
+        weights[test_row][test_col] += test_change
+    else:
+        biases[test_row][test_col] += test_change
 
 # def function that chooses a random cell from the available ones
 def rand_move(board):
@@ -121,36 +149,34 @@ def print_board(board):
         elif board[i] == 1:
             print("[X]", end="")
 
-# train the model against a bot that does random moves for num_games games
+# main code to train the model against a bot that does random moves for num_games games
 num_games = 10000000
 wins = 0
 draws = 0
 losses = 0
 
-# training parameters
-test_rate = 0.1 # the % it will change randomly selected values by during each test
+# starting with 0.01 weights and 1 biases
+# 3 sets of 100 played as control:
+# W41, D8, L51
+# W60, D5, L35
+# W51, D10, L39
+# 1,000,000 training games:
+# W447925, D123377, L428698
+# 3 sets of 100 games to test new network values:
+#
 
 for i in range(num_games):
     if i % (num_games / 100) == 0:
+        # periodically print progress
         clear()
-        print("games played: " + str(i))
-
-    # change a random value for the test
-    posneg = random.randint(0,1) * 2 - 1 # will randomly be 1 or -1
-    test_type = random.randint(0,1)
-    test_row = random.randint(0,8)
-    test_col = random.randint(0,8)
-    if test_type:
-        test_change = test_rate * posneg * weights[test_row][test_col]
-        weights[test_row][test_col] += test_change
-    else:
-        test_change = test_rate * posneg * biases[test_row][test_col]
-        biases[test_row][test_col] += test_change
+        print("games played: " + str(i) + " of " + str(num_games))
 
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     # randomly determine who goes first
     curr_player = random.randint(0, 1)
+    
+    rand_change()
 
     while check_win(board) == 0:
         if curr_player % 2 == 0:
@@ -159,16 +185,13 @@ for i in range(num_games):
             board[rand_move(board)] = 1
         curr_player += 1
 
-    # edit the model based on the outcome of the game
     outcome = check_win(board)
-    # if loss, revert the change back
     if outcome == 1:
         losses += 1
         if test_type:
             weights[test_row][test_col] -= test_change
         else:
             biases[test_row][test_col] -= test_change
-    # if win or draw, keep the change the way it is
     elif outcome == -1:
         wins += 1
     else:
@@ -177,7 +200,6 @@ for i in range(num_games):
 #print_board(board)
 
 # write new weights and biases to save file
-j = -1
 with open("network_properties.txt", "w") as doc:
     for j in range(9):
         for i in range(9):
@@ -185,7 +207,7 @@ with open("network_properties.txt", "w") as doc:
             doc.write(str(biases[j][i]) + "\n")
 
 clear()
-print("games played: " + str(num_games))
+print("\ngames played: " + str(num_games))
 print("wins: " + str(wins))
 print("draws: " + str(draws))
 print("losses: " + str(losses))
