@@ -38,7 +38,7 @@ def avail_moves(board):
     return output
 
 # represent each node of the network as an object
-class node:
+class Node:
     outputs = 0
     weights = []
     biases = []
@@ -81,24 +81,15 @@ def network_cost(nodes, board, good_move):
     good_output = 0
     inputs = [[], [], [], [], [], [], [], [], []]
 
-    # input layer cost
+    # output layer cost
     for i in range(9):
-        # this assumes 1 is the desired input for the output layer node controlling the correct move
+        # this assumes 1 is the desired output of the best move & 0 is desired for the rest
         if i == good_move:
             good_output = 1
         else:
             good_output = 0
         for j in range(9):
             inputs[i].append(nodes[j][0].calculate(i, [board[j]]))
-            total_cost += nodes[j][0].node_cost(i, [board[j]], good_output)
-
-    # output layer cost
-    for i in range(9):
-        # this assumes 1 is the desired output of the best move
-        if i == good_move:
-            good_output = 1
-        else:
-            good_output = 0
         total_cost += nodes[i][1].node_cost(0, inputs[i], good_output)
 
     return total_cost
@@ -107,24 +98,24 @@ def main():
     nodes = [[], [], [], [], [], [], [], [], []]
 
     # this is the only way of initializing the list of node objects that i've found that doesn't link them all together
-    nodes[0].append(node(9))
-    nodes[0].append(node(1))
-    nodes[1].append(node(9))
-    nodes[1].append(node(1))
-    nodes[2].append(node(9))
-    nodes[2].append(node(1))
-    nodes[3].append(node(9))
-    nodes[3].append(node(1))
-    nodes[4].append(node(9))
-    nodes[4].append(node(1))
-    nodes[5].append(node(9))
-    nodes[5].append(node(1))
-    nodes[6].append(node(9))
-    nodes[6].append(node(1))
-    nodes[7].append(node(9))
-    nodes[7].append(node(1))
-    nodes[8].append(node(9))
-    nodes[8].append(node(1))
+    nodes[0].append(Node(9))
+    nodes[0].append(Node(1))
+    nodes[1].append(Node(9))
+    nodes[1].append(Node(1))
+    nodes[2].append(Node(9))
+    nodes[2].append(Node(1))
+    nodes[3].append(Node(9))
+    nodes[3].append(Node(1))
+    nodes[4].append(Node(9))
+    nodes[4].append(Node(1))
+    nodes[5].append(Node(9))
+    nodes[5].append(Node(1))
+    nodes[6].append(Node(9))
+    nodes[6].append(Node(1))
+    nodes[7].append(Node(9))
+    nodes[7].append(Node(1))
+    nodes[8].append(Node(9))
+    nodes[8].append(Node(1))
 
     read_params(nodes)
 
