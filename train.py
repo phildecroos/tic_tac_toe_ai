@@ -47,16 +47,20 @@ class Node:
         self.outputs = outputs
         self.weights = [0 for i in range(outputs)]
         self.biases = [0 for i in range(outputs)]
-
-    def calculate(self, out_i, inputs):
-        output = 0
+    
+    def get_input(self, inputs):
+        input = 0
         for i in inputs:
-            output += i * self.weights[out_i] + self.biases[out_i]
-        output = 1.0 / (1.0 + math.exp(-1 * output))
+            input += i
+        input = 1.0 / (1.0 + math.exp(-1 * input))
+        return input
+        
+    def get_output(self, out_i, input):
+        output = input * self.weights[out_i] + self.biases[out_i]
         return output
     
-    def node_cost(self, out_i, inputs, good_output):
-        output = self.calculate(out_i, inputs)
+    def node_cost(self, out_i, input, good_output):
+        output = self.get_output(out_i, input)
         return (good_output - output)**2
 
 # compute the network outputs from a given board
@@ -64,22 +68,21 @@ def find_move(nodes, board):
     outputs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     for i in range(9):
-        inputs = []
+        input = 0
         for j in range(9):
-            inputs.append(nodes[j][0].calculate(i, [board[j]]))
-        outputs[i] = nodes[i][1].calculate(0, inputs)
+            input += nodes[j][0].get_output(i, board[j])
+        input = nodes[i][1].get_input([input])
+        outputs[i] = nodes[i][1].get_output(0, input)
 
     for i in range(9):
         max_index = outputs.index(max(outputs))
         if max_index in avail_moves(board):
             return max_index
         else:
-            outputs[max_index] = -1.0
+            outputs[max_index] = 0.0
 
 def network_cost(nodes, board, good_move):
-    total_cost = 0
-    good_output = 0
-    inputs = [[], [], [], [], [], [], [], [], []]
+    cost = 0
 
     # output layer cost
     for i in range(9):
@@ -88,11 +91,13 @@ def network_cost(nodes, board, good_move):
             good_output = 1
         else:
             good_output = 0
+        input = 0
         for j in range(9):
-            inputs[i].append(nodes[j][0].calculate(i, [board[j]]))
-        total_cost += nodes[i][1].node_cost(0, inputs[i], good_output)
+            input += nodes[j][0].get_output(i, board[j])
+        input = nodes[i][1].get_input([input])
+        cost += nodes[i][1].node_cost(0, input, good_output)
 
-    return total_cost
+    return cost
 
 def main():
     nodes = [[], [], [], [], [], [], [], [], []]
@@ -117,7 +122,11 @@ def main():
     nodes[8].append(Node(9))
     nodes[8].append(Node(1))
 
+    # get parameters from text file and correct output layer
     read_params(nodes)
+    for i in range(9):
+        nodes[i][1].weights = [1]
+        nodes[i][1].biases = [0]
 
     # dataset to train network to (situation-move pairs)
     situations = [[[0, 0, 0, 0, 0, 0, 0, 0, 0], 4]]
