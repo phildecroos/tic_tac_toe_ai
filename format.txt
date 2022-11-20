@@ -4,9 +4,9 @@ tic tac toe board format:
 [<val>, <val>, <val>, <val>, <val>, <val>, <val>, <val>, <val>]
 
 val: 
- 0 = blank
- 1 = X
--1 = O
+0 = blank
+1 = X
+2 = O
 
 params.txt format (each value is on it's own line):
 weight1

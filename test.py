@@ -19,11 +19,14 @@ def check_end(board):
     if board[2] == board[4] and board[4] == board[6] and board[6] != 0:
         winner = board[2]
 
-    # check if there is no winner but all 9 squares are full
+    # winner
     if winner != 0:
         return winner
     
+    # game is not over
     for i in board:
         if i == 0:
             return 0
-    return 2
+
+    # draw
+    return -1

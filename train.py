@@ -1,5 +1,6 @@
 import math
 import os
+import random
 
 clear = lambda: os.system('cls')
 
@@ -7,7 +8,7 @@ clear = lambda: os.system('cls')
 def read_params(nodes):
     readings = []
 
-    with open("params.txt", "r") as doc:
+    with open("params_init.txt", "r") as doc:
         for line in doc:
             readings.append(line[0:-1])
 
@@ -22,7 +23,7 @@ def read_params(nodes):
 
 # write parameters to txt file
 def write_params(nodes):
-    with open("params.txt", "w") as doc:
+    with open("params_new.txt", "w") as doc:
         for i in range(9):
             for j in range(2):
                 for k in range(nodes[i][j].outputs):
@@ -81,12 +82,12 @@ def find_move(nodes, board):
         else:
             outputs[max_index] = 0.0
 
+# calculate the error of the network's outputs in a given situation
 def network_cost(nodes, board, good_move):
     cost = 0
 
     # output layer cost
     for i in range(9):
-        # this assumes 1 is the desired output of the best move & 0 is desired for the rest
         if i == good_move:
             good_output = 1
         else:
@@ -98,6 +99,45 @@ def network_cost(nodes, board, good_move):
         cost += nodes[i][1].node_cost(0, input, good_output)
 
     return cost
+
+def train_random(nodes, learn_rate, situations):
+    prev_cost = 0
+    for situation in situations:
+        board = situation[0]
+        good_move = situation[1]
+        prev_cost += network_cost(nodes, board, good_move)
+
+    r_type = random.randint(0, 1)
+    r_node = random.randint(0, 8)
+    r_layer = random.randint(0, 1)
+    if r_layer == 0:
+        r_value = random.randint(0, 8)
+    else:
+        r_value = 0
+    r_sign = random.randint(0, 1)
+    if not r_sign:
+        r_sign = -1
+
+    if r_type == 0:
+        change = learn_rate * r_sign * nodes[r_node][r_layer].weights[r_value]
+        nodes[r_node][r_layer].weights[r_value] += change
+    else:
+        change = learn_rate * r_sign * nodes[r_node][r_layer].biases[r_value]
+        nodes[r_node][r_layer].biases[r_value] += change
+    
+    new_cost = 0
+    for situation in situations:
+        board = situation[0]
+        good_move = situation[1]
+        new_cost += network_cost(nodes, board, good_move)
+
+    if new_cost > prev_cost:
+        if r_type == 0:
+            nodes[r_node][r_layer].weights[r_value] -= change
+        else:
+            nodes[r_node][r_layer].biases[r_value] -= change
+    
+    return new_cost - prev_cost
 
 def main():
     nodes = [[], [], [], [], [], [], [], [], []]
@@ -125,17 +165,14 @@ def main():
     # get parameters from text file and correct output layer
     read_params(nodes)
     for i in range(9):
-        nodes[i][1].weights = [1]
-        nodes[i][1].biases = [0]
+        nodes[i][1].weights = [1.0]
+        nodes[i][1].biases = [0.0]
 
     # dataset to train network to (situation-move pairs)
-    situations = [[[0, 0, 0, 0, 0, 0, 0, 0, 0], 4]]
-
-    for situation in situations:
-        board = situation[0]
-        good_move = situation[1]
-        cost = network_cost(nodes, board, good_move)
-        print(cost)
+    situations = [[[0, 0, 0, 0, 0, 0, 0, 0, 0], 4], [[2, 2, 0, 1, 1, 0, 0, 0, 0], 2]]
+    learn_rate = 0.1
+    for i in range(100000):
+        train_random(nodes, learn_rate, situations)
 
     write_params(nodes)
 
