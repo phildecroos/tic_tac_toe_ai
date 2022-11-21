@@ -1,3 +1,11 @@
+import os
+
+# clear the console
+def clear():
+    os.system("cls")
+    print("")
+    os.system("cls")
+
 # print a readable tic tac toe board
 def print_board(board):
     for i in range(9):

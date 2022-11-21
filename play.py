@@ -1,16 +1,16 @@
 import os
+import time
 import random
 from general import *
 from network import *
 from readwrite import *
-
-clear = lambda: os.system('cls')
 
 nodes = generate()
 read_params(nodes, "params_new.txt")
 
 board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 curr_player = random.randint(1, 2)
+clear()
 
 while not check_end(board):
     clear()
