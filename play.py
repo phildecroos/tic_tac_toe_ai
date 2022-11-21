@@ -1,42 +1,47 @@
-import os
-import time
 import random
 from general import *
 from network import *
 from readwrite import *
 
-nodes = generate()
-read_params(nodes, "params_new.txt")
+def player_move(board):
+    move = -1
+    while move not in avail_moves(board):
+        move = input("\nenter your move (X): ")
+        if move.isnumeric():
+            move = int(move)
+    return move
 
-board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-curr_player = random.randint(1, 2)
-clear()
+def main():
+    clear()
+    
+    nodes = generate()
+    read_params(nodes, "params_new.txt")
 
-while not check_end(board):
-    clear()
-    print_board(board)
-    if curr_player == 1:
-        player_move = -1
-        while player_move not in avail_moves(board):
-            player_move = input("\nenter your move (X): ")
-            if player_move.isnumeric():
-                player_move = int(player_move)
-        board[player_move] = 1
-        curr_player = 2
-    else:
-        board[find_move(nodes, board)] = 2
-        curr_player = 1
+    board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    curr_player = random.randint(1, 2)
 
-result = check_end(board)
-if result == 1:
-    clear()
-    print_board(board)
-    print("\nyou won :)")
-elif result == 2:
-    clear()
-    print_board(board)
-    print("\nyou lost :(")
-elif result == -1:
-    clear()
-    print_board(board)
-    print("\ndraw :|")
+    while not check_end(board):
+        clear()
+        print_board(board)
+        if curr_player == 1:
+            board[player_move(board)] = 1
+            curr_player = 2
+        else:
+            board[find_move(nodes, board)] = 2
+            curr_player = 1
+
+    result = check_end(board)
+    if result == 1:
+        clear()
+        print_board(board)
+        print("\nyou won :)")
+    elif result == 2:
+        clear()
+        print_board(board)
+        print("\nyou lost :(")
+    elif result == -1:
+        clear()
+        print_board(board)
+        print("\ndraw :|")
+
+main()
