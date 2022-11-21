@@ -22,6 +22,7 @@ def network_cost(nodes, board, good_move):
 
     return cost
 
+# train the network by making a random change and seeing if it decreases cost
 def train_random(nodes, learn_rate, situations):
     prev_cost = 0
     for situation in situations:
