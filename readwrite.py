@@ -23,3 +23,17 @@ def write_params(nodes, file):
                 for k in range(nodes[i][j].outputs):
                     doc.write(str(nodes[i][j].weights[k]) + "\n")
                     doc.write(str(nodes[i][j].biases[k]) + "\n")
+
+def read_situations():
+    situations = []
+
+    with open("situations.txt", "r") as doc:
+        count = 0
+        for line in doc:
+            situations.append([[], 0])
+            for i in range(9):
+                situations[count][0].append(int(line[i]))
+            situations[count][1] = int(line[9])
+            count += 1
+    
+    return situations

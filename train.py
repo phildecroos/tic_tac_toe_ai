@@ -5,7 +5,7 @@ from network import *
 from readwrite import *
 
 # calculate the error of the network's outputs in a given situation
-def network_cost(nodes, board, good_move):
+def cost(nodes, board, good_move):
     cost = 0
 
     # output layer cost
@@ -22,13 +22,19 @@ def network_cost(nodes, board, good_move):
 
     return cost
 
-# train the network by making a random change and seeing if it decreases cost
-def train_random(nodes, learn_rate, situations):
-    prev_cost = 0
+# calculate the average cost of the network for a series of situations
+def average_cost(nodes, situations):
+    total_cost = 0
     for situation in situations:
         board = situation[0]
         good_move = situation[1]
-        prev_cost += network_cost(nodes, board, good_move)
+        total_cost += cost(nodes, board, good_move)
+    total_cost /= len(situations)
+    return total_cost
+
+# train the network by randomly making a change and keeping it if cost decreases
+def train_random(nodes, learn_rate, situations):
+    prev_cost = average_cost(nodes, situations)
 
     r_type = random.randint(0, 1)
     r_node = random.randint(0, 8)
@@ -48,11 +54,7 @@ def train_random(nodes, learn_rate, situations):
         change = learn_rate * r_sign * nodes[r_node][r_layer].biases[r_value]
         nodes[r_node][r_layer].biases[r_value] += change
     
-    new_cost = 0
-    for situation in situations:
-        board = situation[0]
-        good_move = situation[1]
-        new_cost += network_cost(nodes, board, good_move)
+    new_cost = average_cost(nodes, situations)
 
     if new_cost > prev_cost:
         if r_type == 0:
@@ -62,14 +64,25 @@ def train_random(nodes, learn_rate, situations):
     
     return new_cost - prev_cost
 
+# train the network by changing all parameters along the negative gradient of cost
+def train_gradient(nodes, learn_rate, situations):
+    prev_cost = average_cost(nodes, situations)
+
+    # calculate gradient of cost function
+    # apply the respective changes to each parameter
+
+    new_cost = average_cost(nodes, situations)
+
+    return new_cost - prev_cost
+
 def main():
     nodes = generate()
 
     read_params(nodes, "params_init.txt")
 
     # dataset to train network to (situation-move pairs)
-    situations = [[[0, 0, 0, 0, 0, 0, 0, 0, 0], 4], [[2, 2, 0, 1, 1, 0, 0, 0, 0], 2]]
-    print_board(situations[0][0])
+    situations = read_situations()
+    print(situations)
     learn_rate = 0.1
     for i in range(100):
         train_random(nodes, learn_rate, situations)
