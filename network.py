@@ -54,8 +54,8 @@ def generate():
 
     return nodes
 
-# compute the network outputs from a given board
-def find_move(nodes, board):
+# computer the network outputs for a given board
+def get_outputs(nodes, board):
     outputs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     for i in range(9):
@@ -64,6 +64,12 @@ def find_move(nodes, board):
             input += nodes[j][0].get_output(i, board[j])
         input = nodes[i][1].get_input([input])
         outputs[i] = nodes[i][1].get_output(0, input)
+
+    return outputs
+
+# get the network's preferred move for a given board
+def find_move(nodes, board):
+    outputs = get_outputs(nodes, board)
 
     for i in range(9):
         max_index = outputs.index(max(outputs))

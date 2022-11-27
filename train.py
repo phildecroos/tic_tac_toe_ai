@@ -32,6 +32,25 @@ def average_cost(nodes, situations):
     total_cost /= len(situations)
     return total_cost
 
+def accuracy(nodes, situations):
+    right = 0.0
+    wrong = 0.0
+    for situation in situations:
+        board = situation[0]
+        good_move = situation[1]
+        if find_move(nodes, board) == good_move:
+            right += 1
+        else:
+            wrong += 1
+    return right / (right + wrong)
+
+def convergence(nodes, situations):
+    converged = True
+    for i in range(10): # 10 isnt actually enough to ensure it will pick the moves in the dataset
+        if accuracy(nodes, situations) != 1:
+            converged = False
+    return converged
+
 # train the network by randomly making a change and keeping it if cost decreases
 def train_random(nodes, learn_rate, situations):
     prev_cost = average_cost(nodes, situations)
@@ -82,10 +101,13 @@ def main():
 
     # dataset to train network to (situation-move pairs)
     situations = read_situations()
-    print(situations)
-    learn_rate = 0.1
-    for i in range(100):
+    learn_rate = 0.5
+    print(average_cost(nodes, situations))
+    print(accuracy(nodes, situations))
+    while average_cost(nodes, situations) > 0.5:
         train_random(nodes, learn_rate, situations)
+    print(average_cost(nodes, situations))
+    print(accuracy(nodes, situations))
 
     write_params(nodes, "params_new.txt")
 
