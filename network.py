@@ -77,3 +77,4 @@ def find_move(nodes, board):
             return max_index
         else:
             outputs[max_index] = 0.0
+

@@ -46,7 +46,7 @@ def accuracy(nodes, situations):
 
 def convergence(nodes, situations):
     converged = True
-    for i in range(10): # 10 isnt actually enough to ensure it will pick the moves in the dataset
+    for i in range(10): # 10 isnt actually enough to ensure it will consistently pick the moves in the dataset
         if accuracy(nodes, situations) != 1:
             converged = False
     return converged
@@ -104,7 +104,7 @@ def main():
     learn_rate = 0.5
     print(average_cost(nodes, situations))
     print(accuracy(nodes, situations))
-    while average_cost(nodes, situations) > 0.5:
+    while not convergence(nodes, situations):
         train_random(nodes, learn_rate, situations)
     print(average_cost(nodes, situations))
     print(accuracy(nodes, situations))

@@ -51,11 +51,70 @@ def check_end(board):
     # winner
     if winner != 0:
         return winner
-    
     # game is not over
     for i in board:
         if i == 0:
             return 0
-
     # draw
+    return -1
+
+# return the opposite player of the input
+def change_turn(mover):
+    if mover == 2:
+        return 1
+    return 2
+
+# get the number of possible games that can be played with a certain starting board
+def possibilities(depth, board):
+    count = 0
+    for i in range(9):
+        if board[i] == 0:
+            count += 1
+    cases = count
+    for i in range(count):
+        if i < depth - 1:
+            count -= 1
+            cases *= count
+    return cases
+
+# get the number of games that the ai doesn't lose given a certain starting board
+# if the starting board is already won, put the check_end output in gameover
+def good_outcomes(depth, mover, board, gameover):
+    wins = 0
+    save_board = board.copy()
+
+    if depth > 0:
+        for move in avail_moves(board):
+            board[move] = mover
+            newmover = change_turn(mover)
+            if gameover == 2 or (gameover == 0 and check_end(board) == 2):
+                if depth > 1:
+                    wins += good_outcomes(depth - 1, newmover, board, 2)
+                else:
+                    wins += 1
+            elif gameover == -1 or (gameover == 0 and check_end(board) == -1):
+                wins += 1
+            elif check_end(board) == 0 and depth > 1:
+                wins += good_outcomes(depth - 1, newmover, board, 0)
+            board = save_board.copy()
+    return wins
+
+# find which move results in the highest number of non-losing outcomes for the ai
+def best_move(depth, mover, board):
+    wins = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    save_board = board.copy()
+    local_board = save_board.copy()
+
+    for move in avail_moves(local_board):
+        local_board[move] = mover
+        newmover = change_turn(mover)
+        wins[move] += good_outcomes(depth - 1, newmover, local_board, check_end(local_board))
+        local_board = save_board.copy()
+
+    for i in range(9):
+        max_index = wins.index(max(wins))
+        if max_index in avail_moves(local_board):
+            return max_index
+        else:
+            wins[max_index] = 0.0
     return -1
