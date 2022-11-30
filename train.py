@@ -100,6 +100,8 @@ def main():
         i += 1
         if i % 100 == 0:
             print_status(i, nodes, situations)
+            if i % 1000 == 0:
+                write_params(nodes, "params_new.txt")
         train_random(nodes, learn_rate, situations)
     print_status(i, nodes, situations)
 
