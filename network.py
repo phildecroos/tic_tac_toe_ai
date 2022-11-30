@@ -69,12 +69,12 @@ def get_outputs(nodes, board):
             inputs1 = [0, 0, 0, 0, 0, 0, 0, 0, 0]
             for k in range(9):
                 # input layer
-                inputs1[k] = nodes[k][0].get_output(i, board[k])
+                inputs1[k] = nodes[k][0].get_output(j, board[k])
             # hidden layer
             input1 = nodes[j][1].get_input(inputs1)
-            inputs2[i] += nodes[j][1].get_output(0, input1)
+            inputs2[j] += nodes[j][1].get_output(i, input1)
         # output layer
-        input2 = nodes[i][2].get_input([inputs2[i]])
+        input2 = nodes[i][2].get_input(inputs2)
         outputs[i] = nodes[i][2].get_output(0, input2)
 
     return outputs
