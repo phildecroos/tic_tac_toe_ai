@@ -43,32 +43,35 @@ def accuracy(nodes, situations):
 
 # train the network by randomly making a change and keeping it if cost decreases
 def train_random(nodes, learn_rate, situations):
-    prev_cost = average_cost(nodes, situations)
+    #start_cost = average_cost(nodes, situations)
+    for i in range(len(nodes)):
+        for j in range(len(nodes[0]) - 1):
+            prev_cost = average_cost(nodes, situations)
 
-    r_type = random.randint(0, 1)
-    r_node = random.randint(0, 8)
-    r_layer = random.randint(0, len(nodes[0]) - 2) # do not change output layer values
-    r_value = random.randint(0, 8)
-    r_sign = random.randint(0, 1)
-    if not r_sign:
-        r_sign = -1
+            r_type = random.randint(0, 1)
+            r_node = i #random.randint(0, 8)
+            r_layer = j #random.randint(0, len(nodes[0]) - 2) # do not change output layer values
+            r_value = random.randint(0, 8)
+            r_sign = random.randint(0, 1)
+            if not r_sign:
+                r_sign = -1
 
-    if r_type == 0:
-        change = learn_rate * r_sign * nodes[r_node][r_layer].weights[r_value]
-        nodes[r_node][r_layer].weights[r_value] += change
-    else:
-        change = learn_rate * r_sign * nodes[r_node][r_layer].biases[r_value]
-        nodes[r_node][r_layer].biases[r_value] += change
-    
-    new_cost = average_cost(nodes, situations)
+            if r_type == 0:
+                change = learn_rate * r_sign * nodes[r_node][r_layer].weights[r_value]
+                nodes[r_node][r_layer].weights[r_value] += change
+            else:
+                change = learn_rate * r_sign * nodes[r_node][r_layer].biases[r_value]
+                nodes[r_node][r_layer].biases[r_value] += change
+            
+            new_cost = average_cost(nodes, situations)
 
-    if new_cost > prev_cost:
-        if r_type == 0:
-            nodes[r_node][r_layer].weights[r_value] -= change
-        else:
-            nodes[r_node][r_layer].biases[r_value] -= change
-    
-    return new_cost - prev_cost
+            if new_cost > prev_cost:
+                if r_type == 0:
+                    nodes[r_node][r_layer].weights[r_value] -= change
+                else:
+                    nodes[r_node][r_layer].biases[r_value] -= change
+    #end_cost = average_cost(nodes, situations)
+    #return end_cost - start_cost
 
 # train the network by changing all parameters along the negative gradient of cost
 def train_gradient(nodes, learn_rate, situations):
@@ -93,15 +96,14 @@ def main():
         nodes[i][len(nodes[0]) - 1].biases[0] = 0.0
     situations = read_situations()
 
-    learn_rate = 0.5
+    learn_rate = 0.1
     print_status(0, nodes, situations)
     i = 0
     while accuracy(nodes, situations) != 1.0:
         i += 1
-        if i % 100 == 0:
+        if i % 1 == 0:
             print_status(i, nodes, situations)
-            if i % 1000 == 0:
-                write_params(nodes, "params_new.txt")
+            write_params(nodes, "params_new.txt")
         train_random(nodes, learn_rate, situations)
     print_status(i, nodes, situations)
 
