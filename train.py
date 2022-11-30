@@ -4,25 +4,21 @@ from general import *
 from network import *
 from readwrite import *
 
-# calculate the error of the network's outputs in a given situation
+# calculate the error of the network's outputs for a given data point
 def cost(nodes, board, good_move):
     cost = 0
+    outputs = get_outputs(nodes, board)
 
-    # output layer cost
     for i in range(9):
         if i == good_move:
             good_output = 1
         else:
             good_output = 0
-        input = 0
-        for j in range(9):
-            input += nodes[j][0].get_output(i, board[j])
-        input = nodes[i][1].get_input([input])
-        cost += nodes[i][1].node_cost(0, input, good_output)
+        cost += (good_output - outputs[i])**2
 
     return cost
 
-# calculate the average cost of the network for a series of situations
+# calculate the average cost of the network for a series of data points
 def average_cost(nodes, situations):
     total_cost = 0
     for situation in situations:
@@ -32,6 +28,7 @@ def average_cost(nodes, situations):
     total_cost /= len(situations)
     return total_cost
 
+# the fraction of moves in the dataset that the network gets right
 def accuracy(nodes, situations):
     right = 0.0
     wrong = 0.0
@@ -44,24 +41,14 @@ def accuracy(nodes, situations):
             wrong += 1
     return right / (right + wrong)
 
-def convergence(nodes, situations):
-    converged = True
-    for i in range(10): # 10 isnt actually enough to ensure it will consistently pick the moves in the dataset
-        if accuracy(nodes, situations) != 1:
-            converged = False
-    return converged
-
 # train the network by randomly making a change and keeping it if cost decreases
 def train_random(nodes, learn_rate, situations):
     prev_cost = average_cost(nodes, situations)
 
     r_type = random.randint(0, 1)
     r_node = random.randint(0, 8)
-    r_layer = random.randint(0, 1)
-    if r_layer == 0:
-        r_value = random.randint(0, 8)
-    else:
-        r_value = 0
+    r_layer = random.randint(0, len(nodes[0]) - 2) # do not change output layer values
+    r_value = random.randint(0, 8)
     r_sign = random.randint(0, 1)
     if not r_sign:
         r_sign = -1
@@ -94,20 +81,27 @@ def train_gradient(nodes, learn_rate, situations):
 
     return new_cost - prev_cost
 
+# a way to see progress while training
+def print_status(i, nodes, situations):
+    print("iterations: " + str(i) + ", cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)))
+
 def main():
     nodes = generate()
-
     read_params(nodes, "params_init.txt")
-
-    # dataset to train network to (situation-move pairs)
+    for i in range(9):
+        nodes[i][len(nodes[0]) - 1].weights[0] = 1.0
+        nodes[i][len(nodes[0]) - 1].biases[0] = 0.0
     situations = read_situations()
+
     learn_rate = 0.5
-    print(average_cost(nodes, situations))
-    print(accuracy(nodes, situations))
-    while not convergence(nodes, situations):
+    print_status(0, nodes, situations)
+    i = 0
+    while accuracy(nodes, situations) != 1.0:
+        i += 1
+        if i % 100 == 0:
+            print_status(i, nodes, situations)
         train_random(nodes, learn_rate, situations)
-    print(average_cost(nodes, situations))
-    print(accuracy(nodes, situations))
+    print_status(i, nodes, situations)
 
     write_params(nodes, "params_new.txt")
 

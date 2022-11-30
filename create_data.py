@@ -24,7 +24,6 @@ def get_pair(board):
     return data
 
 # go through all possible games from the starting board, and return a list of board + best move pairs
-# use same structure as good_outcomes, but remove the win count and add a step to situations.append(get_pair(board)) every time O moves
 def all_combos(depth, mover, board):
     situations = []
     save_board = board.copy()
