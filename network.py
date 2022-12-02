@@ -17,7 +17,7 @@ class Node:
         input = 0
         for i in inputs:
             input += i
-        input = 1.0 / (1.0 + math.exp(-1 * input))
+        input = round(1.0 / (1.0 + math.exp(round(-1 * input, 5))), 5)
         return input
         
     def get_output(self, out_i, input):
