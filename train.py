@@ -74,12 +74,16 @@ def calc_gradient(nodes, i, j, k, situations):
     for l in range(2):
         prev_cost = average_cost(nodes, situations)
         if l == 0:
-            change = 0.5 * nodes[i][j].weights[k]
+            change = 0.01
+            if nodes[i][j].weights[k] < 0.05:
+                change = -2 * nodes[i][j].weights[k]
             nodes[i][j].weights[k] += change
             new_cost = average_cost(nodes, situations)
             nodes[i][j].weights[k] -= change
         else:
-            change = 0.5 * nodes[i][j].biases[k]
+            change = 0.01
+            if nodes[i][j].biases[k] < 0.05:
+                change = -2 * nodes[i][j].biases[k]
             nodes[i][j].biases[k] += change
             new_cost = average_cost(nodes, situations)
             nodes[i][j].biases[k] -= change
