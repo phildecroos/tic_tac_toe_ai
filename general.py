@@ -16,7 +16,7 @@ def print_board(board):
             print("[ ]", end="")
         elif board[i] == 1:
             print("[X]", end="")
-        elif board[i] == 2:
+        elif board[i] == -1:
             print("[O]", end="")
 
 # find available moves on a given board
@@ -56,13 +56,11 @@ def check_end(board):
         if i == 0:
             return 0
     # draw
-    return -1
+    return 2
 
 # return the opposite player of the input
 def change_turn(mover):
-    if mover == 2:
-        return 1
-    return 2
+    return -1 * mover
 
 # get the number of possible games that can be played with a certain starting board
 def possibilities(depth, board):
@@ -87,12 +85,12 @@ def good_outcomes(depth, mover, board, gameover):
         for move in avail_moves(board):
             board[move] = mover
             newmover = change_turn(mover)
-            if gameover == 2 or (gameover == 0 and check_end(board) == 2):
+            if gameover == -1 or (gameover == 0 and check_end(board) == -1):
                 if depth > 1:
                     wins += good_outcomes(depth - 1, newmover, board, 2)
                 else:
                     wins += 1
-            elif gameover == -1 or (gameover == 0 and check_end(board) == -1):
+            elif gameover == 2 or (gameover == 0 and check_end(board) == 2):
                 wins += 1
             elif check_end(board) == 0 and depth > 1:
                 wins += good_outcomes(depth - 1, newmover, board, 0)

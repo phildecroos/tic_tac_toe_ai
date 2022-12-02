@@ -30,10 +30,16 @@ def read_situations():
     with open("situations.txt", "r") as doc:
         count = 0
         for line in doc:
-            situations.append([[], 0])
-            for i in range(9):
-                situations[count][0].append(int(line[i]))
-            situations[count][1] = int(line[9])
+            situations.append([["0", "0", "0", "0", "0", "0", "0", "0", "0"], 0])
+            i = 0
+            for j in range(9):
+                if line[i] == "-":
+                    i += 1
+                    situations[count][0][j] = -1 * int(line[i])
+                else:
+                    situations[count][0][j] = int(line[i])
+                i += 1
+            situations[count][1] = int(line[i])
             count += 1
     return situations
 

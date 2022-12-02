@@ -69,9 +69,11 @@ def train_random(nodes, learn_rate, situations):
                     nodes[i][j].biases[r_value] -= change
 
 # calculate approximation of the partial derivative of cost wrt a parameter
-def calc_gradient(nodes, i, j, k, situations):
+def calc_gradient(nodes, i, j, k, situations, bias_only):
     changes = [0, 0]
     for l in range(2):
+        if bias_only:
+            l = 1
         prev_cost = average_cost(nodes, situations)
         if l == 0:
             change = 0.01
@@ -99,7 +101,7 @@ def train_gradient(nodes, learn_rate, gradient, situations):
     for i in range(len(nodes)):
         for j in range(len(nodes[0]) - 1):
             for k in range(nodes[i][j].outputs):
-                gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations)
+                gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations, False)
                 nodes[i][j].weights[k] += learn_rate * gradient[i][j][k][0]
                 nodes[i][j].biases[k] += learn_rate * gradient[i][j][k][1]
 
@@ -111,8 +113,8 @@ def rand_params(nodes):
     for i in range(len(nodes)):
         for j in range(len(nodes[0]) - 1):
             for k in range(nodes[i][j].outputs):
-                nodes[i][j].weights[k] = random.random() + random.randint(0, 1)
-                nodes[i][j].biases[k] = random.random() + random.randint(0, 1)
+                nodes[i][j].weights[k] = random.random() + random.randint(-5, 5)
+                nodes[i][j].biases[k] = random.random() + random.randint(-5, 5)
 
 # a way to see progress while training
 def print_status(i, nodes, situations):
@@ -121,7 +123,6 @@ def print_status(i, nodes, situations):
 def main():
     # set up network
     nodes = generate()
-    read_params(nodes, "params_init.txt") # not needed if randomizing start point
     for i in range(9):
         nodes[i][len(nodes[0]) - 1].weights[0] = 1.0
         nodes[i][len(nodes[0]) - 1].biases[0] = 0.0
@@ -136,23 +137,24 @@ def main():
                 gradient[i][j].append([1, 1])
     training = True
     lowest_cost = 9
-    learn_rate = 1
+    learn_rate = 50
     i = 0
     while (training):
         i += 1
-        rand_params(nodes)
+        read_params(nodes, "params_new.txt")
+        #rand_params(nodes)
         curr_cost = average_cost(nodes, situations)
         if curr_cost < lowest_cost:
             lowest_cost = curr_cost
             write_params(nodes, "params_init.txt")
         print("attempt: " + str(i) + ", cost: " + str(curr_cost) + ", lowest: " + str(lowest_cost))
-        if curr_cost < 2.25:
-            print("FOUND A GOOD STARTING POINT!!!")
+        if True or curr_cost < 2.25: #check for good starting point
+            print("found a good starting point")
             write_params(nodes, "params_init.txt")
             i = 0
             training = False
             cost_change = -1
-            while accuracy(nodes, situations) != 1.0 and cost_change < 0:
+            while (accuracy(nodes, situations) != 1.0) and (cost_change < -0.00001 or cost_change > 0):
                 i += 1
                 cost_change = train_gradient(nodes, learn_rate, gradient, situations)
                 write_params(nodes, "params_new.txt")
