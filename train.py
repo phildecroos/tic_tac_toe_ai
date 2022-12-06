@@ -58,9 +58,21 @@ def train_random(nodes, learn_rate, situations):
             if r_type == 0:
                 change = learn_rate * r_sign * nodes[i][j].weights[r_value]
                 nodes[i][j].weights[r_value] += change
+                if abs(nodes[i][j].weights[r_value]) < 0.1:
+                    nodes[i][j].weights[r_value] = -1 * nodes[i][j].weights[r_value]
+                elif nodes[i][j].weights[r_value] > 15.0:
+                    nodes[i][j].weights[r_value] = 15.0
+                elif nodes[i][j].weights[r_value] < -15.0:
+                    nodes[i][j].weights[r_value] = -15.0
             else:
                 change = learn_rate * r_sign * nodes[i][j].biases[r_value]
                 nodes[i][j].biases[r_value] += change
+                if abs(nodes[i][j].biases[r_value]) < 0.1:
+                    nodes[i][j].biases[r_value] = -1 * nodes[i][j].biases[r_value]
+                elif nodes[i][j].biases[r_value] > 15.0:
+                    nodes[i][j].biases[r_value] = 15.0
+                elif nodes[i][j].biases[r_value] < -15.0:
+                    nodes[i][j].biases[r_value] = -15.0
             
             new_cost = average_cost(nodes, situations)
 
@@ -73,7 +85,7 @@ def train_random(nodes, learn_rate, situations):
     new_cost = average_cost(nodes, situations)
     return new_cost - prev_cost
 
-# calculate approximation of the partial derivative of cost wrt a parameter
+# approximate the partial derivative of cost wrt a parameter
 def calc_gradient(nodes, i, j, k, situations, bias_only):
     changes = [0, 0]
     for l in range(2):
@@ -131,18 +143,11 @@ def rand_params(nodes):
                 nodes[i][j].weights[k] = random.random() + random.randint(-5, 5)
                 nodes[i][j].biases[k] = random.random() + random.randint(-5, 5)
 
-# back up the starting and ending parameters of a trained network
-def best_params(nodes):
-    write_params(nodes, "params_best.txt")
-    read_params(nodes, "params_init.txt")
-    write_params(nodes, "params_best_init.txt")
-
 # a way to see progress while training
 def print_status(i, nodes, situations):
     print("iterations: " + str(i) + ", cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)))
 
 def main():
-    # set up network
     nodes = generate()
     for i in range(9):
         nodes[i][len(nodes[0]) - 1].weights[0] = 1.0
@@ -157,38 +162,17 @@ def main():
             for k in range(nodes[i][j].outputs):
                 gradient[i][j].append([1, 1])
 
-    training = True
-    lowest_cost = 9
-    best_accuracy = 0
-    learn_rate = 10
+    learn_rate = 0.2 # 0.2 for random, 10 for gradient
+    rand_params(nodes)
+    write_params(nodes, "params_init.txt")
+
     i = 0
-    while (training):
-        # try a new random starting point
+    while (accuracy(nodes, situations) != 1.0):
+        print_status(i, nodes, situations)
         i += 1
-        rand_params(nodes)
-        write_params(nodes, "params_init.txt")
-        print("attempt: " + str(i) + ", lowest cost: " + str(lowest_cost) + ", best accuracy: " + str(best_accuracy))
-
-        # train for 10 iterations from that point or until the cost plateaus or accuracy reaches 100%
-        j = 0
-        cost_change = -1
-        while (accuracy(nodes, situations) != 1.0) and (cost_change < -0.001 or cost_change > 0) and (j < 10):
-            print_status(j, nodes, situations)
-            j += 1
-            cost_change = train_gradient(nodes, learn_rate, gradient, situations)
-            write_params(nodes, "params_new.txt")
-        print_status(j, nodes, situations)
-
-        # back up the parameters if the results have the best accuracy so far
-        if average_cost(nodes, situations) < lowest_cost:
-            lowest_cost = average_cost(nodes, situations)
-        if accuracy(nodes, situations) > best_accuracy:
-            best_accuracy = accuracy(nodes, situations)
-            best_params(nodes)
-        if accuracy(nodes, situations) == 1.0:
-            training = False # stop training if you found a solution
-            best_params(nodes)
-
+        train_random(nodes, learn_rate, situations)
+        write_params(nodes, "params_new.txt")
+    
     print("found a solution! cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)))
 
 main()
