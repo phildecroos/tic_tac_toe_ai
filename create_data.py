@@ -39,9 +39,27 @@ def all_combos(depth, mover, board):
             board = save_board.copy()
     return situations
 
-def main():
+# generate a complete dataset of all boards the ai can encounter and the best move
+# doesn't include boards where X goes first, might need to fix
+def generate():
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     situations = all_combos(9, -1, board)
     write_situations(situations)
 
-main()
+# remove situations that have only 1 possible move from dataset
+def remove_ones():
+    situations = read_situations()
+    new_situations = []
+    for situation in situations:
+        new_situation = ""
+        zeros = 0
+        for i in range(9):
+            if situation[0][i] == 0:
+                zeros += 1
+            new_situation += str(situation[0][i])
+        new_situation += str(situation[1])
+        if zeros > 1:
+            new_situations.append(new_situation)
+    write_situations(new_situations)
+
+remove_ones()

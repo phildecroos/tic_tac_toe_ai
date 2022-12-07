@@ -4,6 +4,8 @@ from general import *
 from network import *
 from readwrite import *
 
+MAX_VALUE = 25
+
 # calculate the error of the network's outputs for a given data point
 def cost(nodes, board, good_move):
     cost = 0
@@ -60,19 +62,19 @@ def train_random(nodes, learn_rate, situations):
                 nodes[i][j].weights[r_value] += change
                 if abs(nodes[i][j].weights[r_value]) < 0.1:
                     nodes[i][j].weights[r_value] = -1 * nodes[i][j].weights[r_value]
-                elif nodes[i][j].weights[r_value] > 15.0:
-                    nodes[i][j].weights[r_value] = 15.0
-                elif nodes[i][j].weights[r_value] < -15.0:
-                    nodes[i][j].weights[r_value] = -15.0
+                elif nodes[i][j].weights[r_value] > MAX_VALUE:
+                    nodes[i][j].weights[r_value] = MAX_VALUE
+                elif nodes[i][j].weights[r_value] < -1 * MAX_VALUE:
+                    nodes[i][j].weights[r_value] = -1 * MAX_VALUE
             else:
                 change = learn_rate * r_sign * nodes[i][j].biases[r_value]
                 nodes[i][j].biases[r_value] += change
                 if abs(nodes[i][j].biases[r_value]) < 0.1:
                     nodes[i][j].biases[r_value] = -1 * nodes[i][j].biases[r_value]
-                elif nodes[i][j].biases[r_value] > 15.0:
-                    nodes[i][j].biases[r_value] = 15.0
-                elif nodes[i][j].biases[r_value] < -15.0:
-                    nodes[i][j].biases[r_value] = -15.0
+                elif nodes[i][j].biases[r_value] > MAX_VALUE:
+                    nodes[i][j].biases[r_value] = MAX_VALUE
+                elif nodes[i][j].biases[r_value] < -1 * MAX_VALUE:
+                    nodes[i][j].biases[r_value] = -1 * MAX_VALUE
             
             new_cost = average_cost(nodes, situations)
 
@@ -119,18 +121,18 @@ def train_gradient(nodes, learn_rate, gradient, situations):
                 nodes[i][j].weights[k] += learn_rate * gradient[i][j][k][0]
                 if abs(nodes[i][j].weights[k]) < 0.1:
                     nodes[i][j].weights[k] = -1 * nodes[i][j].weights[k]
-                elif nodes[i][j].weights[k] > 15.0:
-                    nodes[i][j].weights[k] = 15.0
-                elif nodes[i][j].weights[k] < -15.0:
-                    nodes[i][j].weights[k] = -15.0
+                elif nodes[i][j].weights[k] > MAX_VALUE:
+                    nodes[i][j].weights[k] = MAX_VALUE
+                elif nodes[i][j].weights[k] < -1 * MAX_VALUE:
+                    nodes[i][j].weights[k] = -1 * MAX_VALUE
 
                 nodes[i][j].biases[k] += learn_rate * gradient[i][j][k][1]
                 if abs(nodes[i][j].biases[k]) < 0.1:
                     nodes[i][j].biases[k] = -1 * nodes[i][j].biases[k]
-                elif nodes[i][j].biases[k] > 15.0:
-                    nodes[i][j].biases[k] = 15.0
-                elif nodes[i][j].biases[k] < -15.0:
-                    nodes[i][j].biases[k] = -15.0
+                elif nodes[i][j].biases[k] > MAX_VALUE:
+                    nodes[i][j].biases[k] = MAX_VALUE
+                elif nodes[i][j].biases[k] < -1 * MAX_VALUE:
+                    nodes[i][j].biases[k] = -1 * MAX_VALUE
 
     new_cost = average_cost(nodes, situations)
     return new_cost - prev_cost
@@ -162,7 +164,6 @@ def main():
             for k in range(nodes[i][j].outputs):
                 gradient[i][j].append([1, 1])
 
-    learn_rate = 0.2 # 0.2 for random, 10 for gradient
     rand_params(nodes)
     write_params(nodes, "params_init.txt")
 
@@ -170,7 +171,8 @@ def main():
     while (accuracy(nodes, situations) != 1.0):
         print_status(i, nodes, situations)
         i += 1
-        train_random(nodes, learn_rate, situations)
+        #train_random(nodes, 0.2, situations)
+        train_gradient(nodes, 10, gradient, situations)
         write_params(nodes, "params_new.txt")
     
     print("found a solution! cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)))
