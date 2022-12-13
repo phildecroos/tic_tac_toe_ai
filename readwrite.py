@@ -25,9 +25,9 @@ def write_params(nodes, file):
                     doc.write(str(nodes[i][j].biases[k]) + "\n")
 
 # read situations from file
-def read_situations():
+def read_situations(file):
     situations = []
-    with open("situations.txt", "r") as doc:
+    with open(file, "r") as doc:
         count = 0
         for line in doc:
             situations.append([["0", "0", "0", "0", "0", "0", "0", "0", "0"], 0])
@@ -44,7 +44,7 @@ def read_situations():
     return situations
 
 # write situations to file
-def write_situations(situations):
-    with open("situations_new.txt", "w") as doc:
+def write_situations(situations, file):
+    with open(file, "w") as doc:
         for situation in situations:
             doc.write(situation + "\n")

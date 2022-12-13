@@ -12,7 +12,7 @@ def player_move(board):
     return move
 
 def main():
-    clear()
+    #clear()
     
     nodes = generate()
     read_params(nodes, "params_new.txt")
@@ -23,7 +23,7 @@ def main():
         curr_player = -1
 
     while not check_end(board):
-        clear()
+        #clear()
         print_board(board)
         if curr_player == 1:
             board[player_move(board)] = 1
@@ -34,15 +34,15 @@ def main():
 
     result = check_end(board)
     if result == 1:
-        clear()
+        #clear()
         print_board(board)
         print("\nyou won :)")
     elif result == -1:
-        clear()
+        #clear()
         print_board(board)
         print("\nyou lost :(")
     elif result == 2:
-        clear()
+        #clear()
         print_board(board)
         print("\ndraw :|")
 

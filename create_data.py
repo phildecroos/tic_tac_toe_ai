@@ -21,6 +21,9 @@ def get_pair(board):
 # go through all possible games from the starting board, and return a list of board + best move pairs
 def all_combos(depth, mover, board):
     situations = []
+    if check_end(board) != 0:
+        return situations
+
     save_board = board.copy()
 
     if depth > 0:
@@ -40,15 +43,22 @@ def all_combos(depth, mover, board):
     return situations
 
 # generate a complete dataset of all boards the ai can encounter and the best move
-# doesn't include boards where X goes first, might need to fix
 def generate():
+    situations = []
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    situations = all_combos(9, -1, board)
-    write_situations(situations)
+    for situation in all_combos(9, -1, board):
+        if situation not in situations:
+            situations.append(situation)
+
+    board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    for situation in all_combos(9, 1, board):
+        if situation not in situations:
+            situations.append(situation)
+    write_situations(situations, "situations_new.txt")
 
 # remove situations that have only 1 possible move from dataset
-def remove_ones():
-    situations = read_situations()
+def optimize_data():
+    situations = read_situations("situations_new.txt")
     new_situations = []
     for situation in situations:
         new_situation = ""
@@ -60,6 +70,22 @@ def remove_ones():
         new_situation += str(situation[1])
         if zeros > 1:
             new_situations.append(new_situation)
-    write_situations(new_situations)
+    write_situations(new_situations, "situations_new.txt")
 
-remove_ones()
+# check the dataset for bad data (already done games, one move available)
+def data_quality():
+    situations = read_situations("situations_new.txt")
+    for situation in situations:
+        zeros = 0
+        for i in range(9):
+            if situation[0][i] == 0:
+                zeros += 1
+        if zeros <= 1:
+            print(situation)
+
+generate()
+print("generated data")
+data_quality()
+optimize_data()
+print("optimized data")
+data_quality()

@@ -17,7 +17,7 @@ class Node:
         input = 0
         for i in inputs:
             input += i
-        input = round(1.0 / (1.0 + math.exp(round(-1 * input, 5))), 5)
+        input = 1.0 / (1.0 + math.exp(round(-1 * input, 5)))
         return input
         
     def get_output(self, out_i, input):
@@ -30,39 +30,49 @@ def generate():
 
     # this is the only way of initializing the list of node objects that i've found that doesn't link them to the same object
     nodes[0].append(Node(9))
-    nodes[0].append(Node(9))
     nodes[0].append(Node(1))
-    nodes[1].append(Node(9))
     nodes[1].append(Node(9))
     nodes[1].append(Node(1))
     nodes[2].append(Node(9))
-    nodes[2].append(Node(9))
     nodes[2].append(Node(1))
-    nodes[3].append(Node(9))
     nodes[3].append(Node(9))
     nodes[3].append(Node(1))
     nodes[4].append(Node(9))
-    nodes[4].append(Node(9))
     nodes[4].append(Node(1))
-    nodes[5].append(Node(9))
     nodes[5].append(Node(9))
     nodes[5].append(Node(1))
     nodes[6].append(Node(9))
-    nodes[6].append(Node(9))
     nodes[6].append(Node(1))
-    nodes[7].append(Node(9))
     nodes[7].append(Node(9))
     nodes[7].append(Node(1))
     nodes[8].append(Node(9))
-    nodes[8].append(Node(9))
     nodes[8].append(Node(1))
-
+    '''
+    nodes[0].append(Node(9))
+    nodes[1].append(Node(9))
+    nodes[2].append(Node(9))
+    nodes[3].append(Node(9))
+    nodes[4].append(Node(9))
+    nodes[5].append(Node(9))
+    nodes[6].append(Node(9))
+    nodes[7].append(Node(9))
+    nodes[8].append(Node(9))
+    '''
     return nodes
 
 # computer the network outputs for a given board
 def get_outputs(nodes, board):
     outputs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
+    for i in range(9):
+        inputs = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for j in range(9):
+            # input layer
+            inputs[j] = nodes[j][0].get_output(i, board[j])
+        # output layer
+        input = nodes[i][1].get_input(inputs)
+        outputs[i] = nodes[i][1].get_output(0, input)
+    '''
     for i in range(9):
         inputs2 = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         for j in range(9):
@@ -76,7 +86,7 @@ def get_outputs(nodes, board):
         # output layer
         input2 = nodes[i][2].get_input(inputs2)
         outputs[i] = nodes[i][2].get_output(0, input2)
-
+    '''
     return outputs
 
 # get the network's preferred move for a given board
@@ -88,5 +98,4 @@ def find_move(nodes, board):
         if max_index in avail_moves(board):
             return max_index
         else:
-            outputs[max_index] = 0.0
-
+            outputs[max_index] = -1.0

@@ -103,6 +103,21 @@ def best_move(depth, mover, board):
     save_board = board.copy()
     local_board = save_board.copy()
 
+    if mover == -1:
+        # if the ai can win the game in 1 move it will choose that
+        for move in avail_moves(local_board):
+            local_board[move] = -1
+            if check_end(local_board) == -1:
+                return move
+            local_board = save_board.copy()
+
+        # if the ai can lose the game in 1 move the ai will take that square
+        for move in avail_moves(local_board):
+            local_board[move] = 1
+            if check_end(local_board) == 1:
+                return move
+            local_board = save_board.copy()
+
     for move in avail_moves(local_board):
         local_board[move] = mover
         newmover = change_turn(mover)
