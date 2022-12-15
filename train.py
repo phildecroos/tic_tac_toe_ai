@@ -1,4 +1,3 @@
-import math
 import random
 from general import *
 from network import *
@@ -11,7 +10,7 @@ def cost(nodes, board, good_move):
     cost = 0
     outputs = get_outputs(nodes, board)
 
-    for i in range(9):
+    for i in range(len(outputs)):
         if i == good_move:
             good_output = 1
         else:
@@ -23,27 +22,40 @@ def cost(nodes, board, good_move):
 # calculate the average cost of the network for a series of data points
 def average_cost(nodes, situations):
     total_cost = 0
+
     for situation in situations:
         board = situation[0]
         good_move = situation[1]
         total_cost += cost(nodes, board, good_move)
+
     total_cost /= len(situations)
     return total_cost
 
 # the fraction of moves in the dataset that the network gets right
 def accuracy(nodes, situations):
     right = 0.0
-    wrong = 0.0
+
     for situation in situations:
         board = situation[0]
         good_move = situation[1]
         if find_move(nodes, board) == good_move:
             right += 1
-        else:
-            wrong += 1
-    return right / (right + wrong)
 
-# print what the network is doing for a given board compared to the best move
+    return right / len(situations)
+
+# return a subset of the situations that the network doesn't clearly get right
+def incorrect_points(nodes, situations):
+    subset = []
+
+    for situation in situations:
+        board = situation[0]
+        good_move = situation[1]
+        if (find_move(nodes, board) != good_move) or (cost(nodes, board, good_move) > 1):
+            subset.append(situation)
+
+    return subset
+
+# print what the network does for a dataset
 def print_accuracy(nodes, situations):
     for situation in situations:
         board = situation[0]
@@ -56,8 +68,6 @@ def print_accuracy(nodes, situations):
 
 # train the network by randomly making a change and keeping it if cost decreases
 def train_random(nodes, learn_rate, situations):
-    prev_cost = average_cost(nodes, situations)
-
     for i in range(len(nodes)):
         for j in range(len(nodes[0]) - 1):
             prev_cost = average_cost(nodes, situations)
@@ -65,7 +75,7 @@ def train_random(nodes, learn_rate, situations):
             r_type = random.randint(0, 1)
             r_value = random.randint(0, 8)
             r_sign = random.randint(0, 1)
-            if not r_sign:
+            if r_sign == 0:
                 r_sign = -1
 
             if r_type == 0:
@@ -73,7 +83,7 @@ def train_random(nodes, learn_rate, situations):
                 nodes[i][j].weights[r_value] += change
                 if abs(nodes[i][j].weights[r_value]) < 0.1:
                     nodes[i][j].weights[r_value] = -1 * nodes[i][j].weights[r_value]
-                    change = -1 * nodes[i][j].weights[r_value] - nodes[i][j].weights[r_value]
+                    change = 2 * nodes[i][j].weights[r_value]
                 elif nodes[i][j].weights[r_value] > MAX_VALUE:
                     nodes[i][j].weights[r_value] = MAX_VALUE
                     change = 0
@@ -85,7 +95,7 @@ def train_random(nodes, learn_rate, situations):
                 nodes[i][j].biases[r_value] += change
                 if abs(nodes[i][j].biases[r_value]) < 0.1:
                     nodes[i][j].biases[r_value] = -1 * nodes[i][j].biases[r_value]
-                    change = -1 * nodes[i][j].biases[r_value] - nodes[i][j].biases[r_value]
+                    change = 2 * nodes[i][j].biases[r_value]
                 elif nodes[i][j].biases[r_value] > MAX_VALUE:
                     nodes[i][j].biases[r_value] = MAX_VALUE
                     change = 0
@@ -100,16 +110,11 @@ def train_random(nodes, learn_rate, situations):
                     nodes[i][j].weights[r_value] -= change
                 else:
                     nodes[i][j].biases[r_value] -= change
-    
-    new_cost = average_cost(nodes, situations)
-    return new_cost - prev_cost
 
-# approximate the partial derivative of cost wrt a parameter
-def calc_gradient(nodes, i, j, k, situations, bias_only):
+# approximate the partial derivative of cost wrt a node's weight and bias
+def calc_gradient(nodes, i, j, k, situations):
     changes = [0, 0]
     for l in range(2):
-        if bias_only:
-            l = 1
         prev_cost = average_cost(nodes, situations)
         if l == 0:
             change = 0.01 * nodes[i][j].weights[k]
@@ -133,7 +138,7 @@ def train_gradient(nodes, learn_rate, gradient, situations):
     for i in range(len(nodes)):
         for j in range(len(nodes[0]) - 1):
             for k in range(nodes[i][j].outputs):
-                gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations, False)
+                gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations)
 
                 nodes[i][j].weights[k] += learn_rate * gradient[i][j][k][0]
                 if abs(nodes[i][j].weights[k]) < 0.1:
@@ -164,7 +169,7 @@ def rand_params(nodes):
 
 # a way to see progress while training
 def print_status(i, nodes, situations):
-    print("iterations: " + str(i) + ", cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)))
+    print("iterations: " + str(i) + ", cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)) + ", bad points: " + str(len(incorrect_points(nodes, situations))))
 
 def main():
     nodes = generate()
@@ -186,11 +191,23 @@ def main():
     write_params(nodes, "params_init.txt")
 
     i = 0
-    while (accuracy(nodes, situations) != 1.0) and i < 1000:
+    '''
+    # train to whole dataset
+    while (accuracy(nodes, situations) != 1.0):
         print_status(i, nodes, situations)
         i += 1
         #train_random(nodes, 0.2, situations)
         train_gradient(nodes, 10, gradient, situations)
+        write_params(nodes, "params_new.txt")
+    '''
+    
+    # train to the subset of the data that the network gets the most wrong
+    # more of an 
+    while (accuracy(nodes, situations) != 1.0):
+        print_status(i, nodes, situations)
+        i += 1
+        #train_random(nodes, 0.2, incorrect_points(nodes, situations))
+        train_gradient(nodes, 10, gradient, incorrect_points(nodes, situations))
         write_params(nodes, "params_new.txt")
     
     if accuracy(nodes, situations) == 1.0:
