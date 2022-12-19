@@ -62,7 +62,7 @@ def check_end(board):
 def change_turn(mover):
     return -1 * mover
 
-# get the number of possible games that can be played with a certain starting board
+# get the number of possible games from a certain starting board
 def possibilities(depth, board):
     count = 0
     for i in range(9):
@@ -75,8 +75,8 @@ def possibilities(depth, board):
             cases *= count
     return cases
 
-# get the number of games that the ai doesn't lose given a certain starting board
-# if the starting board is already won, put the check_end output in gameover
+# get the # of non-losing outcomes for the ai from a certain starting board
+# if the starting board is won/drawn, put the check_end output in gameover
 def good_outcomes(depth, mover, board, gameover):
     wins = 0
     save_board = board.copy()
@@ -97,7 +97,7 @@ def good_outcomes(depth, mover, board, gameover):
             board = save_board.copy()
     return wins
 
-# find which move results in the highest number of non-losing outcomes for the ai
+# find which move has the highest number of non-losing outcomes for the ai
 def best_move(depth, mover, board):
     wins = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     save_board = board.copy()

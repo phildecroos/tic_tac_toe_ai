@@ -3,6 +3,7 @@ from general import *
 from network import *
 from readwrite import *
 
+# get a move from the user
 def player_move(board):
     move = -1
     while move not in avail_moves(board):

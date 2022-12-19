@@ -1,4 +1,3 @@
-import math
 from general import *
 from network import *
 from readwrite import *
@@ -18,7 +17,7 @@ def get_pair(board):
         data += str(move)
     return data
 
-# go through all possible games from the starting board, and return a list of board + best move pairs
+# go through all possible games from the starting board, and return best moves
 def all_combos(depth, mover, board):
     situations = []
     if check_end(board) != 0:
@@ -42,7 +41,7 @@ def all_combos(depth, mover, board):
             board = save_board.copy()
     return situations
 
-# generate a complete dataset of all boards the ai can encounter and the best move
+# generate a dataset of all boards the ai can encounter and their best move
 def generate():
     situations = []
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]

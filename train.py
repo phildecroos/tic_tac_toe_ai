@@ -66,7 +66,7 @@ def print_accuracy(nodes, situations):
         print("network outputs: " + str(get_outputs(nodes, board)))
         print("chosen move: " + str(find_move(nodes, board)))
 
-# train the network by randomly making a change and keeping it if cost decreases
+# train the network by making random changes and keeping them if cost decreases
 def train_random(nodes, learn_rate, situations):
     for i in range(len(nodes)):
         for j in range(len(nodes[0]) - 1):
@@ -111,7 +111,7 @@ def train_random(nodes, learn_rate, situations):
                 else:
                     nodes[i][j].biases[r_value] -= change
 
-# approximate the partial derivative of cost wrt a node's weight and bias
+# approximate the partial derivatives of cost wrt a node's weight and bias
 def calc_gradient(nodes, i, j, k, situations):
     changes = [0, 0]
     for l in range(2):
@@ -131,7 +131,7 @@ def calc_gradient(nodes, i, j, k, situations):
         changes[l] = change
     return changes
 
-# train the network by changing all parameters along the negative gradient of cost
+# train the network by moving all parameters along the negative cost gradient
 def train_gradient(nodes, learn_rate, gradient, situations):
     prev_cost = average_cost(nodes, situations)
 

@@ -28,7 +28,8 @@ class Node:
 def generate():
     nodes = [[], [], [], [], [], [], [], [], []]
 
-    # this is the only way of initializing the list of node objects that i've found that doesn't link them to the same object
+    # this is the only way of initializing the list of node objects that i've 
+    # found that doesn't link them to the same object in memory
     nodes[0].append(Node(9))
     nodes[0].append(Node(1))
     nodes[1].append(Node(9))
