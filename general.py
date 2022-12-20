@@ -52,9 +52,8 @@ def check_end(board):
     if winner != 0:
         return winner
     # game is not over
-    for i in board:
-        if i == 0:
-            return 0
+    if board.count(0) > 0:
+        return 0
     # draw
     return 2
 
