@@ -14,19 +14,14 @@ class Node:
         self.biases = [0 for i in range(outputs)]
     
     def get_input(self, inputs):
-        input = 0
-        for i in inputs:
-            input += i
-        input = 1.0 / (1.0 + math.exp(round(-1 * input, 5)))
-        return input
+        return 1.0 / (1.0 + math.exp(round(-1 * sum(inputs), 5)))
         
     def get_output(self, out_i, input):
-        output = input * self.weights[out_i] + self.biases[out_i]
-        return output
+        return input * self.weights[out_i] + self.biases[out_i]
 
 # generate network objects and read in parameters
 def generate():
-    nodes = [[], [], [], [], [], [], [], [], []]
+    nodes = [[] for i in range(9)]
 
     # this is the only way of initializing the list of node objects that i've 
     # found that doesn't link them to the same object in memory
@@ -48,25 +43,15 @@ def generate():
     nodes[7].append(Node(1))
     nodes[8].append(Node(9))
     nodes[8].append(Node(1))
-    '''
-    nodes[0].append(Node(9))
-    nodes[1].append(Node(9))
-    nodes[2].append(Node(9))
-    nodes[3].append(Node(9))
-    nodes[4].append(Node(9))
-    nodes[5].append(Node(9))
-    nodes[6].append(Node(9))
-    nodes[7].append(Node(9))
-    nodes[8].append(Node(9))
-    '''
+    
     return nodes
 
 # computer the network outputs for a given board
 def get_outputs(nodes, board):
-    outputs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    outputs = [0.0 for i in range(9)]
 
     for i in range(9):
-        inputs = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        inputs = [0 for i in range(9)]
         for j in range(9):
             # input layer
             inputs[j] = nodes[j][0].get_output(i, board[j])
@@ -75,9 +60,9 @@ def get_outputs(nodes, board):
         outputs[i] = nodes[i][1].get_output(0, input)
     '''
     for i in range(9):
-        inputs2 = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        inputs2 = [0 for i in range(9)]
         for j in range(9):
-            inputs1 = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+            inputs1 = [0 for i in range(9)]
             for k in range(9):
                 # input layer
                 inputs1[k] = nodes[k][0].get_output(j, board[k])

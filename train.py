@@ -10,7 +10,7 @@ def cost(nodes, board, good_move):
     cost = 0
     outputs = get_outputs(nodes, board)
 
-    for i in range(len(outputs)):
+    for i in range(9):
         if i == good_move:
             good_output = 1
         else:
@@ -28,20 +28,19 @@ def average_cost(nodes, situations):
         good_move = situation[1]
         total_cost += cost(nodes, board, good_move)
 
-    total_cost /= len(situations)
-    return total_cost
+    return total_cost / len(situations)
 
 # the fraction of moves in the dataset that the network gets right
 def accuracy(nodes, situations):
-    right = 0.0
+    correct = 0.0
 
     for situation in situations:
         board = situation[0]
         good_move = situation[1]
         if find_move(nodes, board) == good_move:
-            right += 1
+            correct += 1
 
-    return right / len(situations)
+    return correct / len(situations)
 
 # return a subset of the situations that the network doesn't clearly get right
 def incorrect_points(nodes, situations):
@@ -60,8 +59,7 @@ def print_accuracy(nodes, situations):
     for situation in situations:
         board = situation[0]
         good_move = situation[1]
-        print("")
-        print("board" + str(board))
+        print("\nboard" + str(board))
         print("good move: " + str(good_move))
         print("network outputs: " + str(get_outputs(nodes, board)))
         print("chosen move: " + str(find_move(nodes, board)))
@@ -80,23 +78,31 @@ def train_random(nodes, learn_rate, situations):
 
             if r_type == 0:
                 change = learn_rate * r_sign * nodes[i][j].weights[r_value]
-                nodes[i][j].weights[r_value] += change
-                if abs(nodes[i][j].weights[r_value]) < 0.1:
+                # if the value is too small and the change makes it smaller, change its sign
+                # otherwise keep applying fractional changes
+                # this lets values cross zero if the other side is where their ideal value is
+                if (abs(nodes[i][j].weights[r_value]) < 0.1) and (abs(nodes[i][j].weights[r_value] + change) < abs(nodes[i][j].weights[r_value])):
                     nodes[i][j].weights[r_value] = -1 * nodes[i][j].weights[r_value]
                     change = 2 * nodes[i][j].weights[r_value]
-                elif nodes[i][j].weights[r_value] > MAX_VALUE:
+                else:
+                    nodes[i][j].weights[r_value] += change
+
+                # cap the values at the upper and lower bounds
+                if nodes[i][j].weights[r_value] > MAX_VALUE:
                     nodes[i][j].weights[r_value] = MAX_VALUE
                     change = 0
                 elif nodes[i][j].weights[r_value] < -1 * MAX_VALUE:
                     nodes[i][j].weights[r_value] = -1 * MAX_VALUE
                     change = 0
             else:
-                change = learn_rate * r_sign * nodes[i][j].biases[r_value]
-                nodes[i][j].biases[r_value] += change
-                if abs(nodes[i][j].biases[r_value]) < 0.1:
+                if (abs(nodes[i][j].biases[r_value]) < 0.1) and (abs(nodes[i][j].biases[r_value] + change) < abs(nodes[i][j].biases[r_value])):
                     nodes[i][j].biases[r_value] = -1 * nodes[i][j].biases[r_value]
                     change = 2 * nodes[i][j].biases[r_value]
-                elif nodes[i][j].biases[r_value] > MAX_VALUE:
+                else:
+                    change = learn_rate * r_sign * nodes[i][j].biases[r_value]
+                    nodes[i][j].biases[r_value] += change
+
+                if nodes[i][j].biases[r_value] > MAX_VALUE:
                     nodes[i][j].biases[r_value] = MAX_VALUE
                     change = 0
                 elif nodes[i][j].biases[r_value] < -1 * MAX_VALUE:
@@ -133,31 +139,40 @@ def calc_gradient(nodes, i, j, k, situations):
 
 # train the network by moving all parameters along the negative cost gradient
 def train_gradient(nodes, learn_rate, gradient, situations):
-    prev_cost = average_cost(nodes, situations)
+    # can uncomment return new - prev if you need it for convergence checking
+    #prev_cost = average_cost(nodes, situations)
 
     for i in range(len(nodes)):
         for j in range(len(nodes[0]) - 1):
             for k in range(nodes[i][j].outputs):
                 gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations)
 
-                nodes[i][j].weights[k] += learn_rate * gradient[i][j][k][0]
-                if abs(nodes[i][j].weights[k]) < 0.1:
+                # if the value is too small and the gradient wants it to get smaller, change its sign
+                # otherwise keep applying fractional changes
+                # this lets values cross zero if the other side is where their ideal value is
+                if (abs(nodes[i][j].weights[k]) < 0.1) and (abs(nodes[i][j].weights[k] + learn_rate * gradient[i][j][k][0]) < abs(nodes[i][j].weights[k])):
                     nodes[i][j].weights[k] = -1 * nodes[i][j].weights[k]
-                elif nodes[i][j].weights[k] > MAX_VALUE:
+                else:
+                    nodes[i][j].weights[k] += learn_rate * gradient[i][j][k][0]
+                
+                # cap the values at upper and lower bounds
+                if nodes[i][j].weights[k] > MAX_VALUE:
                     nodes[i][j].weights[k] = MAX_VALUE
                 elif nodes[i][j].weights[k] < -1 * MAX_VALUE:
                     nodes[i][j].weights[k] = -1 * MAX_VALUE
 
-                nodes[i][j].biases[k] += learn_rate * gradient[i][j][k][1]
-                if abs(nodes[i][j].biases[k]) < 0.1:
+                if (abs(nodes[i][j].biases[k]) < 0.1) and (abs(nodes[i][j].biases[k] + learn_rate * gradient[i][j][k][0]) < abs(nodes[i][j].biases[k])):
                     nodes[i][j].biases[k] = -1 * nodes[i][j].biases[k]
-                elif nodes[i][j].biases[k] > MAX_VALUE:
+                else:
+                    nodes[i][j].biases[k] += learn_rate * gradient[i][j][k][1]
+
+                if nodes[i][j].biases[k] > MAX_VALUE:
                     nodes[i][j].biases[k] = MAX_VALUE
                 elif nodes[i][j].biases[k] < -1 * MAX_VALUE:
                     nodes[i][j].biases[k] = -1 * MAX_VALUE
 
-    new_cost = average_cost(nodes, situations)
-    return new_cost - prev_cost
+    #new_cost = average_cost(nodes, situations)
+    #return new_cost - prev_cost
 
 # randomize parameters
 def rand_params(nodes):
@@ -187,13 +202,13 @@ def main():
                 gradient[i][j].append([1, 1])
 
     rand_params(nodes)
-    #read_params(nodes, "params_new.txt")
+    #read_params(nodes, "params_new.txt") # uncomment to continue training from previous stopping point
     write_params(nodes, "params_init.txt")
 
     i = 0
     '''
-    # train to whole dataset
-    while (accuracy(nodes, situations) != 1.0):
+    # train to whole dataset each iteration
+    while (accuracy(nodes, situations) < 1.0):
         print_status(i, nodes, situations)
         i += 1
         #train_random(nodes, 0.2, situations)
@@ -203,15 +218,15 @@ def main():
     
     # train to the subset of the data that the network gets the most wrong
     # more of an 
-    while (accuracy(nodes, situations) != 1.0):
+    while (accuracy(nodes, situations) < 1.0):
         print_status(i, nodes, situations)
         i += 1
         #train_random(nodes, 0.2, incorrect_points(nodes, situations))
         train_gradient(nodes, 10, gradient, incorrect_points(nodes, situations))
         write_params(nodes, "params_new.txt")
     
-    if accuracy(nodes, situations) == 1.0:
-        write_params(nodes, "params_best.txt")
-        print("found a solution! cost: " + str(average_cost(nodes, situations)) + ", accuracy: " + str(accuracy(nodes, situations)))
+    write_params(nodes, "params_best.txt")
+    print("found a solution!")
+    print_status(i, nodes, situations)
 
 main()

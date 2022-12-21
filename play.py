@@ -18,18 +18,18 @@ def main():
     # give the user the option to test the best move function instead
     opponent = ""
     while opponent != "nn" and opponent != "bm":
-        print("you can play against the neural network or best move function")
         opponent = input("choose an opponent ('nn' or 'bm'): ")
     
     nodes = generate()
     read_params(nodes, "params_new.txt")
 
-    board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    board = [0 for i in range(9)]
     curr_player = random.randint(0, 1)
-    if not curr_player:
+    if curr_player == 0:
         curr_player = -1
 
-    while not check_end(board):
+    result = 0
+    while result == 0:
         clear()
         print_board(board)
         if curr_player == 1:
@@ -38,22 +38,18 @@ def main():
         else:
             if opponent == "nn":
                 board[find_move(nodes, board)] = -1
-            else:
+            elif opponent == "bm":
                 board[best_move(board.count(0), -1, board)] = -1
             curr_player = 1
+        result = check_end(board)
 
-    result = check_end(board)
+    clear()
+    print_board(board)
     if result == 1:
-        clear()
-        print_board(board)
         print("\nyou won :)")
     elif result == -1:
-        clear()
-        print_board(board)
         print("\nyou lost :(")
     elif result == 2:
-        clear()
-        print_board(board)
         print("\ndraw :|")
 
 main()

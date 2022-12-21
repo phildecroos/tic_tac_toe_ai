@@ -48,18 +48,14 @@ def check_end(board):
     if board[2] == board[4] and board[4] == board[6] and board[6] != 0:
         winner = board[2]
 
-    # winner
+    # win/lose
     if winner != 0:
         return winner
+    # draw (out of empty squares and no winner)
+    if board.count(0) == 0:
+        return 2
     # game is not over
-    if board.count(0) > 0:
-        return 0
-    # draw
-    return 2
-
-# return the opposite player of the input
-def change_turn(mover):
-    return -1 * mover
+    return 0
 
 # get the number of possible games from a certain starting board
 def possibilities(depth, board):
@@ -79,26 +75,27 @@ def possibilities(depth, board):
 def good_outcomes(depth, mover, board, gameover):
     wins = 0
     save_board = board.copy()
+    local_board = save_board.copy()
 
     if depth > 0:
-        for move in avail_moves(board):
-            board[move] = mover
-            newmover = change_turn(mover)
-            if gameover == -1 or (gameover == 0 and check_end(board) == -1):
+        for move in avail_moves(local_board):
+            local_board[move] = mover
+            if gameover == -1 or (gameover == 0 and check_end(local_board) == -1):
                 if depth > 1:
-                    wins += good_outcomes(depth - 1, newmover, board, 2)
+                    wins += good_outcomes(depth - 1, -1 * mover, local_board, -1)
                 else:
                     wins += 1
-            elif gameover == 2 or (gameover == 0 and check_end(board) == 2):
+            elif gameover == 2 or (gameover == 0 and check_end(local_board) == 2):
                 wins += 1
-            elif check_end(board) == 0 and depth > 1:
-                wins += good_outcomes(depth - 1, newmover, board, 0)
-            board = save_board.copy()
+            elif check_end(local_board) == 0 and depth > 1:
+                wins += good_outcomes(depth - 1, -1 * mover, local_board, 0)
+            local_board = save_board.copy()
     return wins
 
 # find which move has the highest number of non-losing outcomes for the ai
+# might have to switch to minmax as this algorithm is not unbeatable
 def best_move(depth, mover, board):
-    wins = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    wins = [-1 for i in range(9)]
     save_board = board.copy()
     local_board = save_board.copy()
 
@@ -119,14 +116,7 @@ def best_move(depth, mover, board):
 
     for move in avail_moves(local_board):
         local_board[move] = mover
-        newmover = change_turn(mover)
-        wins[move] += good_outcomes(depth - 1, newmover, local_board, check_end(local_board))
+        wins[move] += 1 + good_outcomes(depth - 1, -1 * mover, local_board, check_end(local_board))
         local_board = save_board.copy()
 
-    for i in range(9):
-        max_index = wins.index(max(wins))
-        if max_index in avail_moves(local_board):
-            return max_index
-        else:
-            wins[max_index] = 0.0
-    return -1
+    return wins.index(max(wins))

@@ -30,7 +30,7 @@ def read_situations(file):
     with open(file, "r") as doc:
         count = 0
         for line in doc:
-            situations.append([["0", "0", "0", "0", "0", "0", "0", "0", "0"], 0])
+            situations.append([["0" for i in range(9)], 0])
             i = 0
             for j in range(9):
                 if line[i] == "-":
