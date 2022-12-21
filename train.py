@@ -95,6 +95,7 @@ def train_random(nodes, learn_rate, situations):
                     nodes[i][j].weights[r_value] = -1 * MAX_VALUE
                     change = 0
             else:
+                change = learn_rate * r_sign * nodes[i][j].biases[r_value]
                 if (abs(nodes[i][j].biases[r_value]) < 0.1) and (abs(nodes[i][j].biases[r_value] + change) < abs(nodes[i][j].biases[r_value])):
                     nodes[i][j].biases[r_value] = -1 * nodes[i][j].biases[r_value]
                     change = 2 * nodes[i][j].biases[r_value]
@@ -206,7 +207,6 @@ def main():
     write_params(nodes, "params_init.txt")
 
     i = 0
-    '''
     # train to whole dataset each iteration
     while (accuracy(nodes, situations) < 1.0):
         print_status(i, nodes, situations)
@@ -214,16 +214,16 @@ def main():
         #train_random(nodes, 0.2, situations)
         train_gradient(nodes, 10, gradient, situations)
         write_params(nodes, "params_new.txt")
-    '''
     
+    '''
     # train to the subset of the data that the network gets the most wrong
-    # more of an 
     while (accuracy(nodes, situations) < 1.0):
         print_status(i, nodes, situations)
         i += 1
         #train_random(nodes, 0.2, incorrect_points(nodes, situations))
         train_gradient(nodes, 10, gradient, incorrect_points(nodes, situations))
         write_params(nodes, "params_new.txt")
+    '''
     
     write_params(nodes, "params_best.txt")
     print("found a solution!")

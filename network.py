@@ -26,22 +26,33 @@ def generate():
     # this is the only way of initializing the list of node objects that i've 
     # found that doesn't link them to the same object in memory
     nodes[0].append(Node(9))
-    nodes[0].append(Node(1))
     nodes[1].append(Node(9))
-    nodes[1].append(Node(1))
     nodes[2].append(Node(9))
-    nodes[2].append(Node(1))
     nodes[3].append(Node(9))
-    nodes[3].append(Node(1))
     nodes[4].append(Node(9))
-    nodes[4].append(Node(1))
     nodes[5].append(Node(9))
-    nodes[5].append(Node(1))
     nodes[6].append(Node(9))
-    nodes[6].append(Node(1))
     nodes[7].append(Node(9))
-    nodes[7].append(Node(1))
     nodes[8].append(Node(9))
+
+    nodes[0].append(Node(9))
+    nodes[1].append(Node(9))
+    nodes[2].append(Node(9))
+    nodes[3].append(Node(9))
+    nodes[4].append(Node(9))
+    nodes[5].append(Node(9))
+    nodes[6].append(Node(9))
+    nodes[7].append(Node(9))
+    nodes[8].append(Node(9))
+    
+    nodes[0].append(Node(1))
+    nodes[1].append(Node(1))
+    nodes[2].append(Node(1))
+    nodes[3].append(Node(1))
+    nodes[4].append(Node(1))
+    nodes[5].append(Node(1))
+    nodes[6].append(Node(1))
+    nodes[7].append(Node(1))
     nodes[8].append(Node(1))
     
     return nodes
@@ -49,7 +60,7 @@ def generate():
 # computer the network outputs for a given board
 def get_outputs(nodes, board):
     outputs = [0.0 for i in range(9)]
-
+    '''
     for i in range(9):
         inputs = [0 for i in range(9)]
         for j in range(9):
@@ -72,7 +83,7 @@ def get_outputs(nodes, board):
         # output layer
         input2 = nodes[i][2].get_input(inputs2)
         outputs[i] = nodes[i][2].get_output(0, input2)
-    '''
+    
     return outputs
 
 # get the network's preferred move for a given board
