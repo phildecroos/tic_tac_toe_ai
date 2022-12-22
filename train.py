@@ -151,7 +151,7 @@ def train_gradient(nodes, learn_rate, gradient, situations):
                 # if the value is too small and the gradient wants it to get smaller, change its sign
                 # otherwise keep applying fractional changes
                 # this lets values cross zero if the other side is where their ideal value is
-                if (abs(nodes[i][j].weights[k]) < 0.1) and (abs(nodes[i][j].weights[k] + learn_rate * gradient[i][j][k][0]) < abs(nodes[i][j].weights[k])):
+                if (abs(nodes[i][j].weights[k]) < 0.1) and (abs(nodes[i][j].weights[k] + gradient[i][j][k][0]) < abs(nodes[i][j].weights[k])):
                     nodes[i][j].weights[k] = -1 * nodes[i][j].weights[k]
                 else:
                     nodes[i][j].weights[k] += learn_rate * gradient[i][j][k][0]
@@ -162,7 +162,7 @@ def train_gradient(nodes, learn_rate, gradient, situations):
                 elif nodes[i][j].weights[k] < -1 * MAX_VALUE:
                     nodes[i][j].weights[k] = -1 * MAX_VALUE
 
-                if (abs(nodes[i][j].biases[k]) < 0.1) and (abs(nodes[i][j].biases[k] + learn_rate * gradient[i][j][k][0]) < abs(nodes[i][j].biases[k])):
+                if (abs(nodes[i][j].biases[k]) < 0.1) and (abs(nodes[i][j].biases[k] + gradient[i][j][k][1]) < abs(nodes[i][j].biases[k])):
                     nodes[i][j].biases[k] = -1 * nodes[i][j].biases[k]
                 else:
                     nodes[i][j].biases[k] += learn_rate * gradient[i][j][k][1]
