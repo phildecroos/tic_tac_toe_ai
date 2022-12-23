@@ -131,19 +131,17 @@ def main():
         for j in range(len(nodes[0]) - 1):
             gradient[i].append([])
             for k in range(nodes[i][j].outputs):
-                gradient[i][j].append([1, 1])
+                gradient[i][j].append(1)
 
     rand_params(nodes)
-    #read_params(nodes, "params_new.txt")
     write_params(nodes, "params_init.txt")
 
     i = 0
     
-    # train to whole dataset each iteration
     while (accuracy(nodes, situations) < 1.0):
         i += 1
         print_status(i, nodes, situations)
-        train_gradient(nodes, 50, gradient, situations)
+        train_gradient(nodes, 100, gradient, situations)
         write_params(nodes, "params_new.txt")
     
     write_params(nodes, "params_best.txt")
