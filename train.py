@@ -141,7 +141,7 @@ def main():
     while (accuracy(nodes, situations) < 1.0):
         i += 1
         print_status(i, nodes, situations)
-        train_gradient(nodes, 20, gradient, situations)
+        train_gradient(nodes, 50, gradient, situations)
         write_params(nodes, "params_new.txt")
     
     write_params(nodes, "params_best.txt")
