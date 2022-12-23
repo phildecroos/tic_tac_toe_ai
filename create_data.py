@@ -17,21 +17,31 @@ def all_combos(depth, mover, board):
         return situations
 
     # get the best move for the current board if it is the ai's turn
-    save_board = board.copy()
+    local_board = board.copy()
     if depth > 0 and mover == -1:
-        situation = get_pair(save_board)
+        situation = get_pair(local_board)
         if situation not in situations:
             situations.append(situation)
 
     # recursively get the best moves for subsequent boards
     if depth > 1:
-        for move in avail_moves(save_board):
-            save_board[move] = mover
-            new_situations = all_combos(depth - 1, -1 * mover, save_board)
+        # since the ai can be assumed to always do the best move
+        # only check boards where the ai has previously done the best moves
+        # but check boards for all possible moves from the opponent
+        if mover == -1:
+            local_board[best_move(board.count(0), -1, board)] = -1
+            new_situations = all_combos(depth - 1, 1, local_board)
             for situation in new_situations:
                 if situation not in situations:
                     situations.append(situation)
-            save_board = board.copy()
+        else:
+            for move in avail_moves(local_board):
+                local_board[move] = 1
+                new_situations = all_combos(depth - 1, -1, local_board)
+                for situation in new_situations:
+                    if situation not in situations:
+                        situations.append(situation)
+                local_board = board.copy()
     return situations
 
 # generate a dataset of all boards the ai can encounter and their best move
@@ -69,9 +79,10 @@ def data_quality():
             one_moves += 1
     print("one move data points: " + str(one_moves))
 
+print("generating data")
 generate()
-print("generated data")
 data_quality()
+print("optimizing data")
 optimize_data()
-print("optimized data")
 data_quality()
+print("done")

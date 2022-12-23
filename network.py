@@ -6,18 +6,16 @@ from readwrite import *
 class Node:
     outputs = 0
     weights = []
-    biases = []
     
     def __init__(self, outputs):
         self.outputs = outputs
         self.weights = [0 for i in range(outputs)]
-        self.biases = [0 for i in range(outputs)]
     
     def get_input(self, inputs):
         return 1.0 / (1.0 + math.exp(round(-1 * sum(inputs), 5)))
         
     def get_output(self, out_i, input):
-        return input * self.weights[out_i] + self.biases[out_i]
+        return input * self.weights[out_i]
 
 # generate network objects and read in parameters
 def generate():
@@ -34,7 +32,7 @@ def generate():
     nodes[6].append(Node(9))
     nodes[7].append(Node(9))
     nodes[8].append(Node(9))
-
+    
     nodes[0].append(Node(9))
     nodes[1].append(Node(9))
     nodes[2].append(Node(9))

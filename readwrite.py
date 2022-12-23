@@ -12,8 +12,6 @@ def read_params(nodes, file):
             for k in range(nodes[i][j].outputs):
                 nodes[i][j].weights[k] = float(readings[l])
                 l += 1
-                nodes[i][j].biases[k] = float(readings[l])
-                l += 1
 
 # write parameters to file
 def write_params(nodes, file):
@@ -22,7 +20,6 @@ def write_params(nodes, file):
             for j in range(len(nodes[0])):
                 for k in range(nodes[i][j].outputs):
                     doc.write(str(nodes[i][j].weights[k]) + "\n")
-                    doc.write(str(nodes[i][j].biases[k]) + "\n")
 
 # read situations from file
 def read_situations(file):
