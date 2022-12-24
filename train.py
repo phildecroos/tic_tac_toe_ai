@@ -42,23 +42,27 @@ def accuracy(nodes, situations):
 
     return correct / len(situations)
 
+def confidence(nodes, board):
+    outputs = get_outputs(nodes, board)
+    first_choice = max(outputs)
+    outputs[outputs.index(max(outputs))] = -1.0
+    second_choice = max(outputs)
+    return first_choice - second_choice
+
+def average_confidence(nodes, situations):
+    total_confidence = 0
+    for situation in situations:
+        total_confidence += confidence(nodes, situation[0])
+    return total_confidence / len(situations)
+
 # return a subset of the situations that the network doesn't clearly get right
 def incorrect_points(nodes, situations):
     subset = []
-
     for situation in situations:
         board = situation[0]
         good_move = situation[1]
-        if find_move(nodes, board) != good_move:
+        if find_move(nodes, board) != good_move or confidence(nodes, board) < 0.5:
             subset.append(situation)
-        else:
-            outputs = get_outputs(nodes, board)
-            first_choice = max(outputs)
-            outputs[outputs.index(max(outputs))] = -1.0
-            second_choice = max(outputs)
-            if (first_choice - second_choice) < 0.5:
-                subset.append(situation)
-
     return subset
 
 # print what the network does for a dataset
@@ -73,21 +77,21 @@ def print_accuracy(nodes, situations):
 
 # approximate the partial derivatives of cost wrt a node's weight
 def calc_gradient(nodes, i, j, k, situations):
-    derivative = 0
     change = 0.001
-
     prev_cost = average_cost(nodes, situations)
     nodes[i][j].weights[k] += change
     new_cost = average_cost(nodes, situations)
     nodes[i][j].weights[k] -= change
-
-    derivative = ((new_cost - prev_cost) / change)
-    return derivative
+    return ((new_cost - prev_cost) / change)
 
 # train the network by moving all parameters along the negative cost gradient
 def train_gradient(nodes, learn_rate, gradient, situations):
     for i in range(len(nodes)):
-        for j in range(len(nodes[0]) - 1):
+        if len(nodes[i]) - 1 == 0:
+            cols = 1
+        else:
+            cols = len(nodes[i]) - 1
+        for j in range(cols):
             for k in range(nodes[i][j].outputs):
                 gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations)
 
@@ -108,7 +112,7 @@ def train_gradient(nodes, learn_rate, gradient, situations):
 # randomize parameters
 def rand_params(nodes):
     for i in range(len(nodes)):
-        for j in range(len(nodes[0]) - 1):
+        for j in range(len(nodes[i])):
             for k in range(nodes[i][j].outputs):
                 nodes[i][j].weights[k] = random.random() + random.randint(-1, 1)
 
@@ -117,31 +121,35 @@ def print_status(i, nodes, situations):
     print("iteration: " + str(i) + 
           ", cost: " + str(average_cost(nodes, situations)) + 
           ", accuracy: " + str(accuracy(nodes, situations)) +
-          ", bad points: " + str(len(incorrect_points(nodes, situations))))
+          ", bad points: " + str(len(incorrect_points(nodes, situations))))# +
+          #", confidence: " + str(average_confidence(nodes, situations)))
 
 def main():
     nodes = generate()
+    rand_params(nodes)
     for i in range(9):
         nodes[i][len(nodes[0]) - 1].weights[0] = 1.0
+    write_params(nodes, "params_init.txt")
+
     situations = read_situations("situations.txt")
 
     gradient = []
     for i in range(len(nodes)):
         gradient.append([])
-        for j in range(len(nodes[0]) - 1):
+        if len(nodes[i]) - 1 == 0:
+            cols = 1
+        else:
+            cols = len(nodes[i]) - 1
+        for j in range(cols):
             gradient[i].append([])
             for k in range(nodes[i][j].outputs):
                 gradient[i][j].append(1)
 
-    rand_params(nodes)
-    write_params(nodes, "params_init.txt")
-
     i = 0
-    
     while (accuracy(nodes, situations) < 1.0):
         i += 1
         print_status(i, nodes, situations)
-        train_gradient(nodes, 50, gradient, situations)
+        train_gradient(nodes, 30, gradient, situations)
         write_params(nodes, "params_new.txt")
     
     write_params(nodes, "params_best.txt")

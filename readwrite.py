@@ -8,7 +8,7 @@ def read_params(nodes, file):
 
     l = 0
     for i in range(len(nodes)):
-        for j in range(len(nodes[0])):
+        for j in range(len(nodes[i])):
             for k in range(nodes[i][j].outputs):
                 nodes[i][j].weights[k] = float(readings[l])
                 l += 1
@@ -17,7 +17,7 @@ def read_params(nodes, file):
 def write_params(nodes, file):
     with open(file, "w") as doc:
         for i in range(len(nodes)):
-            for j in range(len(nodes[0])):
+            for j in range(len(nodes[i])):
                 for k in range(nodes[i][j].outputs):
                     doc.write(str(nodes[i][j].weights[k]) + "\n")
 
