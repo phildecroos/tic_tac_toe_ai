@@ -114,6 +114,7 @@ def best_move(depth, mover, board):
                 return move
             local_board = save_board.copy()
 
+    # get the win count for each available move
     for move in avail_moves(local_board):
         local_board[move] = mover
         wins[move] += 1 + good_outcomes(depth - 1, -1 * mover, local_board, check_end(local_board))

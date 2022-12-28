@@ -42,6 +42,7 @@ def accuracy(nodes, situations):
 
     return correct / len(situations)
 
+# calculate the difference between the output values for the 1st and 2nd moves
 def confidence(nodes, board):
     outputs = get_outputs(nodes, board)
     first_choice = max(outputs)
@@ -49,6 +50,7 @@ def confidence(nodes, board):
     second_choice = max(outputs)
     return first_choice - second_choice
 
+# get the average of the confidences of the network for every datapoint
 def average_confidence(nodes, situations):
     total_confidence = 0
     for situation in situations:
@@ -149,7 +151,8 @@ def main():
     while (accuracy(nodes, situations) < 1.0):
         i += 1
         print_status(i, nodes, situations)
-        train_gradient(nodes, 30, gradient, situations)
+        # use random.sample(situations, 100) or incorrect_points(nodes, situations) for training subsets
+        train_gradient(nodes, 50, gradient, situations)
         write_params(nodes, "params_new.txt")
     
     write_params(nodes, "params_best.txt")

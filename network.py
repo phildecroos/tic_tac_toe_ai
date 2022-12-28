@@ -83,7 +83,16 @@ def get_outputs(nodes, board):
             local_board[i + 9] = 1
 
     outputs = [0 for i in range(9)]
-    
+    '''
+    for i in range(9):
+        inputs = [0 for i in range(18)]
+        for j in range(18):
+            # input layer
+            inputs[j] = nodes[j][0].get_output(i, local_board[j])
+        # output layer
+        input = nodes[i][1].get_input(inputs)
+        outputs[i] = nodes[i][1].get_output(0, input)
+    '''
     for i in range(9):
         inputs2 = [0 for i in range(9)]
         for j in range(9):
