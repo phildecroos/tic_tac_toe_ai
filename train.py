@@ -89,7 +89,8 @@ def calc_gradient(nodes, i, j, k, situations):
 # train the network by moving all parameters along the negative cost gradient
 def train_gradient(nodes, learn_rate, gradient, situations):
     for i in range(len(nodes)):
-        if len(nodes[i]) - 1 == 0:
+        # only train the weights of input and hidden layers, not output layer
+        if len(nodes[i]) == 1:
             cols = 1
         else:
             cols = len(nodes[i]) - 1
@@ -123,8 +124,7 @@ def print_status(i, nodes, situations):
     print("iteration: " + str(i) + 
           ", cost: " + str(average_cost(nodes, situations)) + 
           ", accuracy: " + str(accuracy(nodes, situations)) +
-          ", bad points: " + str(len(incorrect_points(nodes, situations))))# +
-          #", confidence: " + str(average_confidence(nodes, situations)))
+          ", bad points: " + str(len(incorrect_points(nodes, situations))))
 
 def main():
     nodes = generate()

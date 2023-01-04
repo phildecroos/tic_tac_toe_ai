@@ -62,12 +62,12 @@ def main():
     # the point of the neural network is to be a more efficient way of getting those "best moves"
     # it runs significantly faster, and if it is trained properly it will generate the same results
 
-    print("\nnetwork vs random")
-    results = play("nn", nodes, 10000)
-    results.print_results()
+    # print("\nnetwork vs random")
+    # results = play("nn", nodes, 10000)
+    # results.print_results()
 
     print("\nbest_move vs random")
-    results = play("bm", nodes, 5)
+    results = play("bm", nodes, 200)
     results.print_results()
 
 main()

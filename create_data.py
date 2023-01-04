@@ -85,9 +85,3 @@ data_quality()
 print("optimizing data")
 optimize_data()
 data_quality()
-
-# situations = read_situations("situations_new.txt")
-# for situation in situations:
-#     print("\n")
-#     print_board(situation[0])
-#     print(situation[1])
