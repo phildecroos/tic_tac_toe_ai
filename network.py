@@ -2,7 +2,7 @@ import math
 from general import *
 from readwrite import *
 
-hidden_nodes = 12
+HIDDEN_NODES = 12
 
 # represent each node of the network as an object
 class Node:
@@ -25,10 +25,10 @@ def generate():
 
     # input layer
     for i in range(27):
-        nodes[i].append(Node(hidden_nodes))
+        nodes[i].append(Node(HIDDEN_NODES))
     
     # hidden layers
-    for i in range(hidden_nodes):
+    for i in range(HIDDEN_NODES):
         nodes[i].append(Node(9))
     
     # output layer
@@ -57,8 +57,8 @@ def get_outputs(nodes, board):
 
     outputs = [0 for i in range(9)]
     for i in range(9):
-        inputs2 = [0 for i in range(hidden_nodes)]
-        for j in range(hidden_nodes):
+        inputs2 = [0 for i in range(HIDDEN_NODES)]
+        for j in range(HIDDEN_NODES):
             inputs1 = [0 for i in range(27)]
             for k in range(27):
                 # get input layer node output from board input

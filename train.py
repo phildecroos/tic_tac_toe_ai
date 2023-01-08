@@ -30,33 +30,6 @@ def average_cost(nodes, situations):
 
     return total_cost / len(situations)
 
-# the fraction of moves in the dataset that the network gets right
-def accuracy(nodes, situations):
-    correct = 0.0
-
-    for situation in situations:
-        board = situation[0]
-        good_move = situation[1]
-        if find_move(nodes, board) == good_move:
-            correct += 1
-
-    return correct / len(situations)
-
-# calculate the difference between the output values for the 1st and 2nd moves
-def confidence(nodes, board):
-    outputs = get_outputs(nodes, board)
-    first_choice = max(outputs)
-    outputs[outputs.index(max(outputs))] = -1.0
-    second_choice = max(outputs)
-    return first_choice - second_choice
-
-# get the average of the confidences of the network for every datapoint
-def average_confidence(nodes, situations):
-    total_confidence = 0
-    for situation in situations:
-        total_confidence += confidence(nodes, situation[0])
-    return total_confidence / len(situations)
-
 # return a subset of the situations that the network doesn't clearly get right
 def incorrect_points(nodes, situations):
     subset = []
@@ -67,15 +40,9 @@ def incorrect_points(nodes, situations):
             subset.append(situation)
     return subset
 
-# print what the network does for a dataset
-def print_accuracy(nodes, situations):
-    for situation in situations:
-        board = situation[0]
-        good_move = situation[1]
-        print("\nboard" + str(board))
-        print("good move: " + str(good_move))
-        print("network outputs: " + str(get_outputs(nodes, board)))
-        print("chosen move: " + str(find_move(nodes, board)))
+# the fraction of moves in the dataset that the network gets right
+def accuracy(nodes, situations):
+    return (len(situations) - len(incorrect_points(nodes, situations))) / len(situations)
 
 # approximate the partial derivatives of cost wrt a node's weight
 def calc_gradient(nodes, i, j, k, situations):
@@ -89,8 +56,6 @@ def calc_gradient(nodes, i, j, k, situations):
 # train the network by moving all parameters along the negative cost gradient
 def train_gradient(nodes, learn_rate, gradient, situations):
     for i in range(len(nodes)):
-        # only train the weights of input and hidden layers, not output layer
-        # this only works if the hidden layer has >= nodes than the output layer
         if len(nodes[i]) == len(nodes[0]):
             cols = len(nodes[i]) - 1
         else:
@@ -149,8 +114,12 @@ def main():
 
     i += 1
     print_status(i, nodes, situations)
+
     if accuracy(nodes, situations) == 1.0:
         write_params(nodes, "params_best.txt")
-        print("found a solution!")
+        print("\nfound a solution!")
+    else:
+        for situation in incorrect_points(nodes, situations):
+            print(situation)
 
 main()

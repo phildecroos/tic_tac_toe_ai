@@ -1,4 +1,5 @@
 import os
+from readwrite import *
 
 # clear the console
 def clear():
@@ -121,3 +122,11 @@ def best_move(depth, mover, board):
         local_board = save_board.copy()
 
     return wins.index(max(wins))
+
+def search_move(board, situations):
+    if len(avail_moves(board)) == 1:
+        return avail_moves(board)[0]
+
+    for situation in situations:
+        if situation[0] == board:
+            return situation[1]

@@ -22,7 +22,7 @@ def random_move(board):
         move = random.randint(0, 8)
     return move
 
-def play(player, nodes, games):
+def play(player, games, nodes, situations):
     wins = 0
     losses = 0
     draws = 0
@@ -39,6 +39,8 @@ def play(player, nodes, games):
             else:
                 if player == "nn":
                     board[find_move(nodes, board)] = -1
+                elif player == "ds":
+                    board[search_move(board, situations)] = -1
                 elif player == "bm":
                     board[best_move(board.count(0), -1, board)] = -1
             curr_player *= -1
@@ -55,19 +57,19 @@ def play(player, nodes, games):
 
 def main():
     nodes = generate()
-    read_params(nodes, "params_new.txt")
-    
-    # no need (and code doesnt currently allow) for the network to play against best_move
-    # run accuracy() on the network to see how similarly it acts to best_move (ideally it's the same i.e. 1.0 accuracy)
-    # the point of the neural network is to be a more efficient way of getting those "best moves"
-    # it runs significantly faster, and if it is trained properly it will generate the same results
+    read_params(nodes, "good_params/12nodes_97percent_params.txt")
+    situations = read_situations("situations.txt")
 
     print("\nnetwork vs random")
-    results = play("nn", nodes, 10000)
+    results = play("nn", 10000, nodes, situations)
+    results.print_results()
+
+    print("\ndataset searcher vs random")
+    results = play("ds", 10000, nodes, situations)
     results.print_results()
 
     print("\nbest_move vs random")
-    results = play("bm", nodes, 200)
+    results = play("bm", 10000, nodes, situations)
     results.print_results()
 
 main()
