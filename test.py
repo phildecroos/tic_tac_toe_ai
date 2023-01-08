@@ -58,13 +58,13 @@ def main():
     read_params(nodes, "params_new.txt")
     
     # no need (and code doesnt currently allow) for the network to play against best_move
-    # run accuracy() on the network to see how similarly it acts to best_move (ideally it's the same)
+    # run accuracy() on the network to see how similarly it acts to best_move (ideally it's the same i.e. 1.0 accuracy)
     # the point of the neural network is to be a more efficient way of getting those "best moves"
     # it runs significantly faster, and if it is trained properly it will generate the same results
 
-    # print("\nnetwork vs random")
-    # results = play("nn", nodes, 10000)
-    # results.print_results()
+    print("\nnetwork vs random")
+    results = play("nn", nodes, 10000)
+    results.print_results()
 
     print("\nbest_move vs random")
     results = play("bm", nodes, 200)

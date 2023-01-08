@@ -1,7 +1,8 @@
 import math
-import random
 from general import *
 from readwrite import *
+
+hidden_nodes = 12
 
 # represent each node of the network as an object
 class Node:
@@ -22,56 +23,18 @@ class Node:
 def generate():
     nodes = [[] for i in range(27)]
 
-    # this is the only way of initializing the list of node objects that i've 
-    # found that doesn't link them to the same object in memory
-    nodes[0].append(Node(9))
-    nodes[1].append(Node(9))
-    nodes[2].append(Node(9))
-    nodes[3].append(Node(9))
-    nodes[4].append(Node(9))
-    nodes[5].append(Node(9))
-    nodes[6].append(Node(9))
-    nodes[7].append(Node(9))
-    nodes[8].append(Node(9))
-    nodes[9].append(Node(9))
-    nodes[10].append(Node(9))
-    nodes[11].append(Node(9))
-    nodes[12].append(Node(9))
-    nodes[13].append(Node(9))
-    nodes[14].append(Node(9))
-    nodes[15].append(Node(9))
-    nodes[16].append(Node(9))
-    nodes[17].append(Node(9))
-    nodes[18].append(Node(9))
-    nodes[19].append(Node(9))
-    nodes[20].append(Node(9))
-    nodes[21].append(Node(9))
-    nodes[22].append(Node(9))
-    nodes[23].append(Node(9))
-    nodes[24].append(Node(9))
-    nodes[25].append(Node(9))
-    nodes[26].append(Node(9))
+    # input layer
+    for i in range(27):
+        nodes[i].append(Node(hidden_nodes))
+    
+    # hidden layers
+    for i in range(hidden_nodes):
+        nodes[i].append(Node(9))
+    
+    # output layer
+    for i in range(9):
+        nodes[i].append(Node(1))
 
-    nodes[0].append(Node(9))
-    nodes[1].append(Node(9))
-    nodes[2].append(Node(9))
-    nodes[3].append(Node(9))
-    nodes[4].append(Node(9))
-    nodes[5].append(Node(9))
-    nodes[6].append(Node(9))
-    nodes[7].append(Node(9))
-    nodes[8].append(Node(9))
-    
-    nodes[0].append(Node(1))
-    nodes[1].append(Node(1))
-    nodes[2].append(Node(1))
-    nodes[3].append(Node(1))
-    nodes[4].append(Node(1))
-    nodes[5].append(Node(1))
-    nodes[6].append(Node(1))
-    nodes[7].append(Node(1))
-    nodes[8].append(Node(1))
-    
     return nodes
 
 def print_network(nodes):
@@ -94,18 +57,18 @@ def get_outputs(nodes, board):
 
     outputs = [0 for i in range(9)]
     for i in range(9):
-        inputs2 = [0 for i in range(9)]
-        for j in range(9):
+        inputs2 = [0 for i in range(hidden_nodes)]
+        for j in range(hidden_nodes):
             inputs1 = [0 for i in range(27)]
             for k in range(27):
-                # input layer
+                # get input layer node output from board input
                 inputs1[k] = nodes[k][0].get_output(j, local_board[k])
-            # hidden layer
+            # get hidden layer node output
             input1 = nodes[j][1].get_input(inputs1)
             inputs2[j] += nodes[j][1].get_output(i, input1)
-        # output layer
-        input2 = nodes[i][2].get_input(inputs2)
-        outputs[i] = nodes[i][2].get_output(0, input2)
+        # get output layer node output
+        input2 = nodes[i][len(nodes[i]) - 1].get_input(inputs2)
+        outputs[i] = nodes[i][len(nodes[i]) - 1].get_output(0, input2)
 
     return outputs
 
