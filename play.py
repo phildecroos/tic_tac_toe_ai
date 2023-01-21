@@ -21,7 +21,7 @@ def main():
         opponent = input("choose an opponent ('nn' or 'bm'): ")
     
     nodes = generate()
-    read_params(nodes, "good_params/12nodes_97percent_params.txt")
+    read_params(nodes, "good_params/11nodes_96percent_params.txt")
 
     board = [0 for i in range(9)]
     curr_player = random.randint(0, 1)

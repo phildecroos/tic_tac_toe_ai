@@ -2,7 +2,7 @@ import math
 from general import *
 from readwrite import *
 
-HIDDEN_NODES = 12
+HIDDEN_NODES = 11
 
 # represent each node of the network as an object
 class Node:
