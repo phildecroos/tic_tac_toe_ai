@@ -75,10 +75,17 @@ def get_outputs(nodes, board):
 # get the network's preferred move for a given board
 def find_move(nodes, board):
     outputs = get_outputs(nodes, board)
+    original_outputs = outputs.copy()
+    print("\nneural network outputs:")
+    print(outputs)
 
     for i in range(9):
         max_index = outputs.index(max(outputs))
         if max_index in avail_moves(board):
+            original_outputs[max_index] = 0
+            confidence = round(100 * (max(outputs) - max(original_outputs)), 2)
+            print("\nchosen move (highest output): " + str(max_index))
+            print("confidence: " + str(confidence) + "%\n")
             return max_index
         else:
             outputs[max_index] = -1.0

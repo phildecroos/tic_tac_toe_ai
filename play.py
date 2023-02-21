@@ -16,9 +16,10 @@ def main():
     clear()
 
     # give the user the option to test the best move function instead
-    opponent = ""
-    while opponent != "nn" and opponent != "bm":
-        opponent = input("choose an opponent ('nn' or 'bm'): ")
+    # opponent = ""
+    # while opponent != "nn" and opponent != "bm":
+    #     opponent = input("choose an opponent ('nn' or 'bm'): ")
+    opponent = "nn"
     
     nodes = generate()
     read_params(nodes, "good_params/11nodes_96percent_params.txt")
@@ -30,10 +31,10 @@ def main():
 
     result = 0
     while result == 0:
-        clear()
         print_board(board)
         if curr_player == 1:
             board[player_move(board)] = 1
+            clear()
             curr_player = -1
         else:
             if opponent == "nn":

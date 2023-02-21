@@ -9,16 +9,18 @@ def clear():
 
 # print a readable tic tac toe board
 def print_board(board):
+    row = ""
     for i in range(9):
-        if i % 3 == 0 and i != 0:
-            print("")
-
         if board[i] == 0:
-            print("[ ]", end="")
+            row += "[ ]"
         elif board[i] == 1:
-            print("[X]", end="")
+            row += "[X]"
         elif board[i] == -1:
-            print("[O]", end="")
+            row += "[O]"
+
+        if i == 2 or i == 5 or i == 8:
+            print(row)
+            row = ""
 
 # find available moves on a given board
 def avail_moves(board):
