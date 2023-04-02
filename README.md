@@ -1,1 +1,1 @@
-# Tic Tac Toe Machine Learning
+# Tic Tac Toe AI
