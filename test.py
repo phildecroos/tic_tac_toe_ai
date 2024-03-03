@@ -3,24 +3,27 @@ from general import *
 from network import *
 from readwrite import *
 
+
 class Test_Results:
     def __init__(self, games, wins, draws, losses):
         self.games = games
         self.wins = wins
         self.draws = draws
         self.losses = losses
-    
+
     def print_results(self):
         print(str(self.games) + " games")
         print("wins: " + str(self.wins))
         print("draws: " + str(self.draws))
         print("losses: " + str(self.losses))
 
+
 def random_move(board):
     move = -1
     while move not in avail_moves(board):
         move = random.randint(0, 8)
     return move
+
 
 def play(player, games, nodes, situations):
     wins = 0
@@ -32,7 +35,7 @@ def play(player, games, nodes, situations):
         curr_player = random.randint(0, 1)
         if curr_player == 0:
             curr_player = -1
-        
+
         while check_end(board) == 0:
             if curr_player == 1:
                 board[random_move(board)] = 1
@@ -52,8 +55,9 @@ def play(player, games, nodes, situations):
             draws += 1
         elif result == 1:
             losses += 1
-    
+
     return Test_Results(games, wins, draws, losses)
+
 
 def main():
     nodes = generate()
@@ -71,5 +75,6 @@ def main():
     print("\nbest_move vs random")
     results = play("bm", 10000, nodes, situations)
     results.print_results()
+
 
 main()

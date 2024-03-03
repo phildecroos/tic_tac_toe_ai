@@ -13,6 +13,7 @@ def read_params(nodes, file):
                 nodes[i][j].weights[k] = float(readings[l])
                 l += 1
 
+
 # write parameters to file
 def write_params(nodes, file):
     with open(file, "w") as doc:
@@ -20,6 +21,7 @@ def write_params(nodes, file):
             for j in range(len(nodes[i])):
                 for k in range(nodes[i][j].outputs):
                     doc.write(str(nodes[i][j].weights[k]) + "\n")
+
 
 # read situations from file
 def read_situations(file):
@@ -39,6 +41,7 @@ def read_situations(file):
             situations[count][1] = int(line[i])
             count += 1
     return situations
+
 
 # write situations to file
 def write_situations(situations, file):

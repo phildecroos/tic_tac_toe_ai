@@ -5,6 +5,7 @@ from readwrite import *
 
 MAX_VALUE = 20.0
 
+
 # calculate the error of the network's outputs for a given data point
 def cost(nodes, board, good_move):
     cost = 0
@@ -15,9 +16,10 @@ def cost(nodes, board, good_move):
             good_output = 1
         else:
             good_output = 0
-        cost += (good_output - outputs[i])**2
+        cost += (good_output - outputs[i]) ** 2
 
     return cost
+
 
 # calculate the average cost of the network for a series of data points
 def average_cost(nodes, situations):
@@ -30,6 +32,7 @@ def average_cost(nodes, situations):
 
     return total_cost / len(situations)
 
+
 # return a subset of the situations that the network doesn't clearly get right
 def incorrect_points(nodes, situations):
     subset = []
@@ -40,9 +43,13 @@ def incorrect_points(nodes, situations):
             subset.append(situation)
     return subset
 
+
 # the fraction of moves in the dataset that the network gets right
 def accuracy(nodes, situations):
-    return (len(situations) - len(incorrect_points(nodes, situations))) / len(situations)
+    return (len(situations) - len(incorrect_points(nodes, situations))) / len(
+        situations
+    )
+
 
 # approximate the partial derivatives of cost wrt a node's weight
 def calc_gradient(nodes, i, j, k, situations):
@@ -51,7 +58,8 @@ def calc_gradient(nodes, i, j, k, situations):
     nodes[i][j].weights[k] += change
     new_cost = average_cost(nodes, situations)
     nodes[i][j].weights[k] -= change
-    return ((new_cost - prev_cost) / change)
+    return (new_cost - prev_cost) / change
+
 
 # train the network by moving all parameters along the negative cost gradient
 def train_gradient(nodes, learn_rate, gradient, situations):
@@ -64,11 +72,12 @@ def train_gradient(nodes, learn_rate, gradient, situations):
             for k in range(nodes[i][j].outputs):
                 gradient[i][j][k] = calc_gradient(nodes, i, j, k, situations)
                 nodes[i][j].weights[k] -= learn_rate * gradient[i][j][k]
-                
+
                 if nodes[i][j].weights[k] > MAX_VALUE:
                     nodes[i][j].weights[k] = MAX_VALUE
                 elif nodes[i][j].weights[k] < -1 * MAX_VALUE:
                     nodes[i][j].weights[k] = -1 * MAX_VALUE
+
 
 # randomize parameters
 def rand_params(nodes):
@@ -77,11 +86,18 @@ def rand_params(nodes):
             for k in range(nodes[i][j].outputs):
                 nodes[i][j].weights[k] = random.random() + random.randint(-1, 0)
 
+
 # a way to see progress while training
 def print_status(i, nodes, situations):
-    print("iteration: " + str(i) + 
-          ", cost: " + str(average_cost(nodes, situations)) + 
-          ", accuracy: " + str(accuracy(nodes, situations)))
+    print(
+        "iteration: "
+        + str(i)
+        + ", cost: "
+        + str(average_cost(nodes, situations))
+        + ", accuracy: "
+        + str(accuracy(nodes, situations))
+    )
+
 
 def main():
     nodes = generate()
@@ -121,5 +137,6 @@ def main():
     else:
         for situation in incorrect_points(nodes, situations):
             print(situation)
+
 
 main()

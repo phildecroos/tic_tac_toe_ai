@@ -4,20 +4,22 @@ from readwrite import *
 
 HIDDEN_NODES = 11
 
+
 # represent each node of the network as an object
 class Node:
     outputs = 0
     weights = []
-    
+
     def __init__(self, outputs):
         self.outputs = outputs
         self.weights = [0 for i in range(outputs)]
-    
+
     def get_input(self, inputs):
         return 1.0 / (1.0 + math.exp(round(-1 * sum(inputs), 5)))
-        
+
     def get_output(self, out_i, input):
         return input * self.weights[out_i]
+
 
 # generate network objects and read in parameters
 def generate():
@@ -26,22 +28,24 @@ def generate():
     # input layer
     for i in range(27):
         nodes[i].append(Node(HIDDEN_NODES))
-    
+
     # hidden layers
     for i in range(HIDDEN_NODES):
         nodes[i].append(Node(9))
-    
+
     # output layer
     for i in range(9):
         nodes[i].append(Node(1))
 
     return nodes
 
+
 def print_network(nodes):
     for i in range(len(nodes)):
         print("row: " + str(i))
         for j in range(len(nodes[i])):
             print(nodes[i][j].weights)
+
 
 # computer the network outputs for a given board
 def get_outputs(nodes, board):
@@ -71,6 +75,7 @@ def get_outputs(nodes, board):
         outputs[i] = nodes[i][len(nodes[i]) - 1].get_output(0, input2)
 
     return outputs
+
 
 # get the network's preferred move for a given board
 def find_move(nodes, board):

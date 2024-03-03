@@ -2,6 +2,7 @@ from general import *
 from network import *
 from readwrite import *
 
+
 # get a string representing the board and best move in the training data format
 def get_pair(board):
     data = ""
@@ -9,6 +10,7 @@ def get_pair(board):
         data += str(i)
     data += str(best_move(board.count(0), -1, board))
     return data
+
 
 # go through all possible games from the starting board, and return best moves
 def all_combos(depth, mover, board):
@@ -44,10 +46,11 @@ def all_combos(depth, mover, board):
                 local_board = board.copy()
     return situations
 
+
 # generate a dataset of all boards the ai can encounter and their best move
 def generate():
     situations = []
-    
+
     board = [0 for i in range(9)]
     for situation in all_combos(9, -1, board):
         if situation not in situations:
@@ -56,6 +59,7 @@ def generate():
         if situation not in situations:
             situations.append(situation)
     write_situations(situations, "situations_new.txt")
+
 
 # remove bad data points from the dataset (rn its boards with only one move)
 def optimize_data():
@@ -70,6 +74,7 @@ def optimize_data():
             new_situations.append(new_situation)
     write_situations(new_situations, "situations_new.txt")
 
+
 # check the dataset for bad data (rn its boards with only one move)
 def data_quality():
     situations = read_situations("situations_new.txt")
@@ -78,6 +83,7 @@ def data_quality():
         if situation[0].count(0) == 1:
             one_moves += 1
     print("one move data points: " + str(one_moves))
+
 
 print("generating data")
 generate()

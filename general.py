@@ -1,11 +1,13 @@
 import os
 from readwrite import *
 
+
 # clear the console
 def clear():
     os.system("cls")
     print("")
     os.system("cls")
+
 
 # print a readable tic tac toe board
 def print_board(board):
@@ -22,6 +24,7 @@ def print_board(board):
             print(row)
             row = ""
 
+
 # find available moves on a given board
 def avail_moves(board):
     output = []
@@ -29,6 +32,7 @@ def avail_moves(board):
         if board[i] == 0:
             output.append(i)
     return output
+
 
 # check a given board to see if the game is over
 def check_end(board):
@@ -60,6 +64,7 @@ def check_end(board):
     # game is not over
     return 0
 
+
 # get the number of possible games from a certain starting board
 def possibilities(depth, board):
     count = 0
@@ -72,6 +77,7 @@ def possibilities(depth, board):
             count -= 1
             cases *= count
     return cases
+
 
 # get the # of non-losing outcomes for the ai from a certain starting board
 # if the starting board is won/drawn, put the check_end output in gameover
@@ -94,6 +100,7 @@ def good_outcomes(depth, mover, board, gameover):
                 wins += good_outcomes(depth - 1, -1 * mover, local_board, 0)
             local_board = save_board.copy()
     return wins
+
 
 # find which move has the highest number of non-losing outcomes for the ai
 # might have to switch to minmax as this algorithm is not unbeatable
@@ -120,10 +127,13 @@ def best_move(depth, mover, board):
     # get the win count for each available move
     for move in avail_moves(local_board):
         local_board[move] = mover
-        wins[move] += 1 + good_outcomes(depth - 1, -1 * mover, local_board, check_end(local_board))
+        wins[move] += 1 + good_outcomes(
+            depth - 1, -1 * mover, local_board, check_end(local_board)
+        )
         local_board = save_board.copy()
 
     return wins.index(max(wins))
+
 
 def search_move(board, situations):
     if len(avail_moves(board)) == 1:
